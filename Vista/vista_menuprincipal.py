@@ -1,6 +1,6 @@
 from tkinter import Tk, Label, Button, Frame
 from PIL import Image, ImageTk
-from configuracion_vista import ConfiguracionVista as cv
+from Vista.configuracion_vista import ConfiguracionVista as cv
 
 
 class VistaMenuPrincipal:

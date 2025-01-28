@@ -2,7 +2,7 @@ from tkinter import Tk, Frame, Label, Entry, Button
 from tkinter import ttk
 from tkcalendar import DateEntry
 from datetime import date
-from configuracion_vista import ConfiguracionVista as cv
+from Vista.configuracion_vista import ConfiguracionVista as cv
 
 class VentanaVentas:
     
