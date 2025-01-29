@@ -87,6 +87,32 @@ class VentanaVentas:
         self.boton_finalizar_venta = Button(self.frame_finalizacion_venta,text='Finalizar venta',font=cv.fuentes['boton'],width=16)
         self.boton_finalizar_venta.place(relx=0.5,rely=0.2,anchor='center')
 
+        # Treeview
+        self.treeview_carrito = ttk.Treeview(self.frame_treeview_carrito,columns=('col1','col2','col3','col4'),height=25)
+
+        self.treeview_carrito.column("#0",width=150,anchor='center')
+        self.treeview_carrito.column("col1",width=400,anchor='center')
+        self.treeview_carrito.column("col2",width=250,anchor='center')
+        self.treeview_carrito.column("col3",width=150,anchor='center')
+        self.treeview_carrito.column("col4",width=250,anchor='center')
+
+        self.treeview_carrito.heading("#0",text='Codigo',anchor='center')
+        self.treeview_carrito.heading("col1",text='Producto',anchor='center')
+        self.treeview_carrito.heading("col2",text='Precio',anchor='center')
+        self.treeview_carrito.heading("col3",text='Cantidad',anchor='center')
+        self.treeview_carrito.heading("col4",text='Subtotal',anchor='center')
+
+        self.treeview_carrito.grid(row=0,column=0,sticky='nsew')
+
+        # Style para Treeview
+        self.style = ttk.Style(self.frame_treeview_carrito)
+        self.style.configure("Treeview.Heading",font=cv.fuentes['treeview-heading'])
+        self.style.configure("Treeview",font=cv.fuentes['treeview'])
+
+        # Scrollbar
+        self.scrollbar = ttk.Scrollbar(self.frame_treeview_carrito,orient='vertical',command=self.treeview_carrito.yview)
+        self.treeview_carrito.config(yscrollcommand=self.scrollbar.set)
+        self.scrollbar.grid(row=0,column=1,sticky='ns')
 
 class VentanaConsultaVentas:
 
