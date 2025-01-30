@@ -37,7 +37,3 @@ class VistaMenuPrincipal:
         self.label_logo.pack()
         self.label_logo.image = imagen_tk
 
-if __name__ == "__main__":
-    root = Tk()
-    app = VistaMenuPrincipal(root)
-    root.mainloop()

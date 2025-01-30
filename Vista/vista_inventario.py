@@ -78,6 +78,13 @@ class VentanaInventario:
         self.treeview_inventario.config(yscrollcommand=self.scrollbar.set)
         self.scrollbar.grid(row=0,column=1,sticky='ns')
 
+    def limpiar_cajas(self):
+        self.entry_descripcion.delete(0,'end')
+        self.entry_codigo.delete(0,'end')
+    
+    def limpiar_treeview(self):
+        for child in self.treeview_inventario.get_children():
+            self.treeview_inventario.delete(child)
 
 class VentanaDetalleProducto:
 
@@ -116,12 +123,8 @@ class VentanaDetalleProducto:
         # Button
         self.boton_guardar = Button(self.root,text='Guardar',font=cv.fuentes['boton'],width=15)
         self.boton_guardar.place(relx=0.5,rely=0.85,anchor='center')
-
-
-
-
-
-if __name__ == "__main__":
-    root = Tk()
-    app = VentanaInventario(root)
-    root.mainloop()
+    
+    def limpiar_cajas(self):
+        self.entry_cantidad.delete(0,'end')
+        self.entry_descripcion.delete(0,'end')
+        self.entry_precio.delete(0,'end')

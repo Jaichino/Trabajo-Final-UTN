@@ -113,6 +113,19 @@ class VentanaVentas:
         self.scrollbar = ttk.Scrollbar(self.frame_treeview_carrito,orient='vertical',command=self.treeview_carrito.yview)
         self.treeview_carrito.config(yscrollcommand=self.scrollbar.set)
         self.scrollbar.grid(row=0,column=1,sticky='ns')
+    
+    def limpiar_cajas(self):
+        self.entry_cantidad.delete(0,'end')
+        self.entry_codigo.delete(0,'end')
+    
+    
+    def limpiar_cliente(self):
+        self.entry_cliente.delete(0,'end')
+    
+
+    def limpiar_treeview(self):
+        for child in self.treeview_carrito.get_children():
+            self.treeview_carrito.delete(child)
 
 class VentanaConsultaVentas:
 
@@ -177,7 +190,10 @@ class VentanaConsultaVentas:
         self.scrollbar = ttk.Scrollbar(self.frame_treeview,orient='vertical',command=self.treeview_consulta.yview)
         self.treeview_consulta.config(yscrollcommand=self.scrollbar.set)
         self.scrollbar.grid(row=0,column=1,sticky='ns')
-
+    
+    def limpiar_treeview(self):
+        for child in self.treeview_consulta.get_children():
+            self.treeview_consulta.delete(child)
 
 class VentanaMiembros:
 
@@ -222,9 +238,9 @@ class VentanaMiembros:
         # Button
         self.boton_guardar = Button(self.root,text='Registrar',font=cv.fuentes['boton'],width=15)
         self.boton_guardar.place(relx=0.5,rely=0.88,anchor='center')
-
-
-if __name__ == '__main__':
-    root = Tk()
-    VentanaVentas(root)
-    root.mainloop()
+    
+    def limpiar_cajas(self):
+        self.entry_cliente.delete(0,'end')
+        self.entry_documento.delete(0,'end')
+        self.entry_email.delete(0,'end')
+        self.entry_telefono.delete(0,'end')
