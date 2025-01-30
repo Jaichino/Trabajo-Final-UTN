@@ -14,16 +14,23 @@ class ModeloInventario:
                     VALUES (?,?,?)
                 '''
 
-        BaseDatos.realizar_consulta(query,(descripcion,precio_unitario,stock),None)
+        BaseDatos.realizar_consulta(query,
+                                    (descripcion,precio_unitario,stock),
+                                    None)
 
     
     @staticmethod
     def modificar_producto(descripcion,precio_unitario,stock,codigo_producto):
-        query = ''' UPDATE Productos SET descripcion = ?, precio_unitario = ?, stock = ?
+
+        query = ''' UPDATE Productos SET descripcion = ?, 
+                    precio_unitario = ?, 
+                    stock = ?
                     WHERE codigo_producto = ?
                 '''
         
-        BaseDatos.realizar_consulta(query,(descripcion,precio_unitario,stock,codigo_producto),None)
+        BaseDatos.realizar_consulta(query,
+                                    (descripcion,precio_unitario,stock,codigo_producto),
+                                    None)
 
     
     @staticmethod
@@ -59,3 +66,14 @@ class ModeloInventario:
                     WHERE stock = ? AND estado = ?'''
 
         return BaseDatos.realizar_consulta(query,(0,'True'),'SELECT')
+    
+    
+    @staticmethod
+    def info_producto(codigo, estado='True'):
+
+        query = ''' SELECT descripcion, precio_unitario, stock
+                    FROM Productos WHERE estado = ? AND
+                    codigo_producto = ?
+                '''
+        
+        return BaseDatos.realizar_consulta(query,(estado,codigo),'SELECT')
