@@ -1,5 +1,5 @@
 from tkinter import Tk
-from Controlador.controlador_menuprincipal import ControladorMenuPrincipal
+from controlador.controlador_menuprincipal import ControladorMenuPrincipal
 
 def main():
     root = Tk()
