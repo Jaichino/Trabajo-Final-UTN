@@ -23,24 +23,50 @@ class ControladorInventario:
         # Se guarda id_producto segun self.seleccion
         self.id_producto = None
 
-        # Asignacion de funciones a botones
-        # Boton nuevo producto
+
+        # Configuracion boton nuevo producto
         self.vista_inventario.boton_nuevo_producto.config(
             command = self.abrir_nuevo_producto
         )
 
-        # Boton modificar producto
+        # Configuracion boton modificar producto
         self.vista_inventario.boton_editar_producto.config(
             command = self.abrir_modificacion_producto
         )
 
+        # Configuracion boton filtrado de productos
         self.vista_inventario.boton_buscar.config(
             command = self.boton_filtrar_productos
         )
 
+        # Configuracion boton productos sin stock
         self.vista_inventario.boton_sin_stock.config(
             command = self.boton_sin_stock
         )
+
+        # Configuracion boton eliminar producto
+        self.vista_inventario.boton_eliminar_producto.config(
+            command = self.boton_eliminar_producto
+        )
+
+
+    def llenar_treeview_productos(self):
+        # Obtencion de lista de productos
+        productos = self.modelo_inventario.mostrar_productos()
+
+        # Limpieza de treeview
+        self.vista_inventario.limpiar_treeview()
+
+        # Si se encuentran productos, se itera lista y se agregan a treeview
+        if productos:
+            for prod in productos:
+                self.vista_inventario.treeview_inventario.insert(
+                    '',
+                    'end',
+                    text = prod[0],
+                    values = (prod[1],prod[2],prod[3])
+                )
+
 
     def abrir_nuevo_producto(self):
         self.seleccion = self.vista_inventario.treeview_inventario.selection()
@@ -51,8 +77,8 @@ class ControladorInventario:
             )
         else:
             self.ventana_detalle_producto()
-    
-    
+
+
     def abrir_modificacion_producto(self):
         self.seleccion = self.vista_inventario.treeview_inventario.selection()
         if len(self.seleccion) > 1:
@@ -103,24 +129,6 @@ class ControladorInventario:
         )
 
 
-    def llenar_treeview_productos(self):
-        # Obtencion de lista de productos
-        productos = self.modelo_inventario.mostrar_productos()
-        
-        # Limpieza de treeview
-        self.vista_inventario.limpiar_treeview()
-        
-        # Si se encuentran productos, se itera lista y se agregan a treeview
-        if productos:
-            for prod in productos:
-                self.vista_inventario.treeview_inventario.insert(
-                    '',
-                    'end',
-                    text = prod[0],
-                    values = (prod[1],prod[2],prod[3])
-                )
-    
-
     def boton_filtrar_productos(self):
         # Obtencion de entradas de usuario
         codigo = self.vista_inventario.entry_codigo.get()
@@ -150,8 +158,8 @@ class ControladorInventario:
         # Limpieza de cajas y focus en entry codigo
         self.vista_inventario.limpiar_cajas()
         self.vista_inventario.entry_codigo.focus()
-    
-    
+
+
     def boton_sin_stock(self):
         # Limpieza de treview
         self.vista_inventario.limpiar_treeview()
@@ -224,3 +232,35 @@ class ControladorInventario:
             messagebox.showerror('Error',f'Error inesperado - {e}')
 
 
+    def boton_eliminar_producto(self):
+        
+        # Verificacion seleccion de elementos
+        self.seleccion = self.vista_inventario.treeview_inventario.selection()
+        if len(self.seleccion) != 1:
+            messagebox.showwarning(
+                'Error',
+                'Debes seleccionar UN elemento'
+            )
+            return
+
+        # Obtencion id_producto
+        self.id_producto = self.vista_inventario.treeview_inventario.item(
+            self.seleccion,
+            'text'
+        )
+    
+        # Consulta de eliminacion
+        confirmacion = messagebox.askyesno(
+            'Confirmacion',
+            f'¿Desea eliminar el producto ({self.id_producto})?'
+        )
+        # Eliminacion, actualizacion de treeview y mensaje de confirmacion
+        if confirmacion:
+            self.modelo_inventario.eliminar_producto(self.id_producto)
+            # Mensaje de confirmacion y actualizacion de treeview
+            self.vista_inventario.limpiar_treeview()
+            self.llenar_treeview_productos()
+            messagebox.showinfo(
+                'Producto eliminado',
+                f'Producto ({self.id_producto}) eliminado del stock!'
+            )
