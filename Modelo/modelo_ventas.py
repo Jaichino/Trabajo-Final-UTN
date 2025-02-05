@@ -1,5 +1,5 @@
 import re
-from database import BaseDatos
+from modelo.database import BaseDatos
 
 
 class ModeloVentas:

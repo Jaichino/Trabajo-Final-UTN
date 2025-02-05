@@ -1,6 +1,7 @@
 from tkinter import *
 from vista.vista_menuprincipal import VistaMenuPrincipal
 from controlador.controlador_inventario import ControladorInventario
+from controlador.controlador_ventas import ControladorVentas
 
 class ControladorMenuPrincipal:
 
@@ -16,7 +17,7 @@ class ControladorMenuPrincipal:
 
         # Asignacion de funciones para abrir modulos a los respectivos botones
         self.vista.boton_inventario.config(command=self.iniciar_modulo_inventario)
-        #self.vista.boton_ventas.config(command=self.iniciar_modulo_ventas)
+        self.vista.boton_ventas.config(command=self.iniciar_modulo_ventas)
 
     """
     Metodos para iniciar los modulos de inventario y ventas, primero se minimiza el
@@ -34,12 +35,12 @@ class ControladorMenuPrincipal:
         self.top_level.protocol("WM_DELETE_WINDOW",self.cerrar_modulo)
     
 
-    #def iniciar_modulo_ventas(self):
-    #    self.minimizar_menu_principal()
-    #    self.top_level = Toplevel(self.root)
-    #    self.abrir_ventana_ventas = ControladorVentas(self.top_level)
-    #    self.top_level.grab_set()
-    #    self.top_level.protocol("WM_DELETE_WINDOW",self.cerrar_modulo)
+    def iniciar_modulo_ventas(self):
+        self.minimizar_menu_principal()
+        self.top_level = Toplevel(self.root)
+        self.abrir_ventana_ventas = ControladorVentas(self.top_level)
+        self.top_level.grab_set()
+        self.top_level.protocol("WM_DELETE_WINDOW",self.cerrar_modulo)
 
     
     # Método para minimizar menu principal
