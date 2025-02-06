@@ -18,6 +18,9 @@ class ControladorVentas:
         self.total_venta = 0
         self.total_pagar = 0
 
+        # Guardado id_cliente
+        self.cliente = 0
+
         # Asignacion de evento a entry_codigo
         self.vista_ventas.entry_codigo.bind(
             "<KeyRelease>", 
@@ -27,6 +30,11 @@ class ControladorVentas:
         # Asignacion de funcion agregar a carrito
         self.vista_ventas.boton_agregar_carrito.config(
             command = self.boton_agregar_carrito
+        )
+
+        # Asignacion de funcion a boton validar cliente
+        self.vista_ventas.boton_validar_cliente.config(
+            command = self.boton_validar_cliente
         )
 
     
@@ -109,7 +117,92 @@ class ControladorVentas:
                 text = f'Total de venta: $ {self.total_venta}'
             )
 
+            self.total_pagar = self.total_venta
+            self.vista_ventas.label_total_a_pagar.config(
+                text = f'Total a pagar: $ {self.total_pagar}'
+            )
+
         except ValueError:
             messagebox.showerror('Error','Error en ingreso de datos')
         except Exception as e:
             messagebox.showerror('Error',f'Error inesperado - {e}')
+
+
+    def boton_validar_cliente(self):
+
+        # Verificacion de que primero haya productos en carrito
+        productos_carrito = self.vista_ventas.treeview_carrito.get_children()
+        if not productos_carrito:
+            messagebox.showwarning(
+                'Carrito vacio',
+                'Antes de validar cliente, se debe cargar un producto'
+            )
+            return
+
+        # Obtencion dni de cliente
+        cliente = self.vista_ventas.entry_cliente.get()
+
+        # Verificacion que existe en base de clientes
+        validacion = self.modelo_ventas.obtener_nombre_cliente(cliente)
+        if not validacion:
+            self.vista_ventas.label_cliente_encontrado.config(
+                text = 'Cliente: No registrado')
+            
+            # Se setea descuento en $0
+            descuento = 0
+            self.total_pagar = self.total_venta
+            self.vista_ventas.label_descuentos.config(
+                text = 'Descuentos: $ 0'
+            )
+
+            # El monto a pagar es igual al monto de venta
+            self.vista_ventas.label_total_a_pagar.config(
+                text = f'Total a pagar: $ {self.total_pagar}'
+            )
+            
+            # Se guarda al cliente inexistente con id = 0
+            self.cliente = 0
+        
+        # Si cliente es miembro, se aplica descuento
+        else:   
+                # Obtencion nombre de cliente
+                nombre_cliente = validacion[0][0]
+
+                # Se verifica que no se aplique descuento mas veces
+                if self.cliente != cliente:
+                    
+                    # Se comienza con monto a pagar = monto venta
+                    self.total_pagar = self.total_venta
+
+                    # Se setea nombre de cliente en label
+                    self.cliente = cliente
+                    self.vista_ventas.label_cliente_encontrado.config(
+                        text = f'Cliente: {nombre_cliente}'
+                    )
+                    
+                    # Se calcula descuento y se aplica
+                    descuento = ModeloVentas().DESCUENTO_MIEMBRO
+                    
+                    # Se aplica si supera el monto minimo
+                    monto_minimo = ModeloVentas().MONTO_MINIMO
+                    
+                    if self.total_venta > monto_minimo:
+                        descuento_aplicado = descuento * self.total_venta
+                    else:
+                        descuento_aplicado = 0
+                    
+                    self.vista_ventas.label_descuentos.config(
+                        text = f'Descuentos: $ {descuento_aplicado}'
+                    )
+                    
+                    self.total_pagar -= descuento_aplicado
+                    self.vista_ventas.label_total_a_pagar.config(
+                        text = f'Total a pagar: $ {self.total_pagar}'
+                    )
+                
+                # Si ya se verifico el cliente, se muestra mensaje
+                else:
+                    messagebox.showwarning(
+                        'Cliente Validado',
+                        'Ya se ha validado al cliente'
+                    )

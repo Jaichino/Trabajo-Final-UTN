@@ -7,6 +7,9 @@ class ModeloVentas:
     # Atributo de clase para asignar descuento a clientes miembros
     DESCUENTO_MIEMBRO = 0.20
 
+    # Atributo de clase para asignar monto minimo para aplicar descuento
+    MONTO_MINIMO = 20000
+
 
     @staticmethod
     def nueva_venta(fecha,cliente,monto_total,descuento_miembro):

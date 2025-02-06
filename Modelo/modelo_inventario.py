@@ -5,11 +5,11 @@ class ModeloInventario:
     @staticmethod
     def mostrar_productos():
         query = 'SELECT * FROM Productos WHERE estado = ?'
-        return BaseDatos.realizar_consulta(query,('True',),'SELECT')
+        return BaseDatos.realizar_consulta(query, ('True',), 'SELECT')
 
 
     @staticmethod
-    def nuevo_producto(descripcion,precio_unitario,stock):
+    def nuevo_producto(descripcion, precio_unitario, stock):
         query = ''' INSERT INTO Productos (descripcion,precio_unitario,stock)
                     VALUES (?,?,?)
                 '''
@@ -20,7 +20,7 @@ class ModeloInventario:
 
     
     @staticmethod
-    def modificar_producto(descripcion,precio_unitario,stock,codigo_producto):
+    def modificar_producto(descripcion, precio_unitario, stock, codigo_producto):
 
         query = ''' UPDATE Productos SET descripcion = ?, 
                     precio_unitario = ?, 
@@ -39,7 +39,7 @@ class ModeloInventario:
                     WHERE codigo_producto = ?
                 '''
 
-        BaseDatos.realizar_consulta(query,(codigo_producto,),None)
+        BaseDatos.realizar_consulta(query, (codigo_producto,), None)
     
 
     @staticmethod
@@ -57,7 +57,7 @@ class ModeloInventario:
         
         query += ' ORDER BY descripcion'
 
-        return BaseDatos.realizar_consulta(query,params,'SELECT')
+        return BaseDatos.realizar_consulta(query, params, 'SELECT')
         
 
     @staticmethod
@@ -65,7 +65,7 @@ class ModeloInventario:
         query = ''' SELECT * FROM Productos 
                     WHERE stock = ? AND estado = ?'''
 
-        return BaseDatos.realizar_consulta(query,(0,'True'),'SELECT')
+        return BaseDatos.realizar_consulta(query, (0,'True'), 'SELECT')
     
     
     @staticmethod
@@ -76,4 +76,13 @@ class ModeloInventario:
                     codigo_producto = ?
                 '''
         
-        return BaseDatos.realizar_consulta(query,(estado,codigo),'SELECT')
+        return BaseDatos.realizar_consulta(query, (estado,codigo), 'SELECT')
+
+    @staticmethod
+    def descontar_producto(codigo, cantidad):
+
+        query = ''' UPDATE Productos SET stock = stock - cantidad
+                    WHERE codigo_producto = ?
+                '''
+        
+        BaseDatos.realizar_consulta(query, (cantidad, codigo), None)
