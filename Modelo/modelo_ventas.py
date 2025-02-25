@@ -8,19 +8,18 @@ class ModeloVentas:
     DESCUENTO_MIEMBRO = 0.20
 
     # Atributo de clase para asignar monto minimo para aplicar descuento
-    MONTO_MINIMO = 20000
+    MONTO_MINIMO = 30000
 
 
     @staticmethod
-    def nueva_venta(fecha,cliente,monto_total,descuento_miembro):
+    def nueva_venta(nro_venta,fecha,cliente,monto_total,descuento_miembro):
 
-        query = ''' INSERT INTO Ventas(fecha,cliente,monto_total,descuento_miembro)
-                    VALUES (?,?,?,?)
+        query = ''' 
+                    INSERT INTO Ventas(nro_venta,fecha,cliente,monto_total,descuento_miembro) VALUES (?,?,?,?,?)
+
                 '''
 
-        BaseDatos.realizar_consulta(query,
-                                    (fecha,cliente,monto_total,descuento_miembro),
-                                    None)
+        BaseDatos.realizar_consulta(query,(nro_venta,fecha,cliente,monto_total,descuento_miembro),None)
 
     @staticmethod
     def agregar_detalle_ventas(nro_venta,codigo_producto,cantidad):
@@ -37,10 +36,11 @@ class ModeloVentas:
     @staticmethod
     def consulta_ventas(fecha_inicio,fecha_final):
 
-        query = ''' SELECT v.nro_venta,
-                    v.fecha,
-                    c.nombre,
-                    v.monto_total
+        query = ''' SELECT 
+                        v.nro_venta,
+                        v.fecha,
+                        c.nombre,
+                        v.monto_total
                     FROM Ventas v
                     INNER JOIN Clientes c
                     ON v.cliente = c.documento
@@ -92,6 +92,37 @@ class ModeloVentas:
         
         return BaseDatos.realizar_consulta(query,(dni,),'SELECT')
     
+    @staticmethod
+    def obtener_nro_venta():
+        
+        query = ''' SELECT MAX(nro_venta)
+                    FROM Ventas
+                '''
+        
+        return BaseDatos.realizar_consulta(query,None,'SELECT')
+    
+
+    @staticmethod
+    def obtener_detalle_ventas(nro_venta):
+
+        query = ''' SELECT
+                        codigo_producto,
+                        cantidad
+                    FROM DetalleVentas
+                    WHERE nro_venta = ?
+                '''
+
+        return BaseDatos.realizar_consulta(query, (nro_venta,), 'SELECT')
+
+
+
+
+
+
+
+
+
+
 
     @staticmethod
     def validacion_cliente(cliente):

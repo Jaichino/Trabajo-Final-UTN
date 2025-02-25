@@ -1,9 +1,12 @@
 
 class ConfiguracionVista:
+    
     ''' 
-    En esta clase se definen todas las propiedades que se encargaran de configurar 
-    las vistas, a modo de facilitar los cambios a medida que la aplicacion crece
+    En esta clase se definen todas las propiedades que se encargaran de
+    configurar las vistas, a modo de facilitar los cambios a medida que 
+    la aplicacion crece
     '''
+    
     # Resolucion de pantalla (coordenada en x e y)
     res_x = 1920
     res_y = 1080

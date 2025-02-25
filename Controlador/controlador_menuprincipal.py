@@ -16,15 +16,18 @@ class ControladorMenuPrincipal:
         self.vista = VistaMenuPrincipal(root)
 
         # Asignacion de funciones para abrir modulos a los respectivos botones
-        self.vista.boton_inventario.config(command=self.iniciar_modulo_inventario)
+        self.vista.boton_inventario.config(
+            command=self.iniciar_modulo_inventario
+        )
         self.vista.boton_ventas.config(command=self.iniciar_modulo_ventas)
 
     """
-    Metodos para iniciar los modulos de inventario y ventas, primero se minimiza el
-    menu principal utilizando el metodo iconify(), se genera un TopLevel de root y 
-    se instancian las clases para generar las vistas correspondientes. Se establece 
-    protocolo en TopLevel para cerrar modulos al cerrar la ventana desde la cruz, 
-    esto llama nuevamente al menu principal.
+    Metodos para iniciar los modulos de inventario y ventas, primero se 
+    minimiza el menu principal utilizando el metodo iconify(), se genera
+    un TopLevel de root y se instancian las clases para generar las vistas
+    correspondientes. Se establece protocolo en TopLevel para cerrar modulos
+    al cerrar la ventana desde la cruz, esto llama nuevamente al menu 
+    principal.
     """
 
     def iniciar_modulo_inventario(self):
@@ -32,7 +35,7 @@ class ControladorMenuPrincipal:
         self.top_level = Toplevel(self.root)
         self.abrir_ventana_inventario = ControladorInventario(self.top_level)
         self.top_level.grab_set()
-        self.top_level.protocol("WM_DELETE_WINDOW",self.cerrar_modulo)
+        self.top_level.protocol("WM_DELETE_WINDOW", self.cerrar_modulo)
     
 
     def iniciar_modulo_ventas(self):
@@ -40,7 +43,7 @@ class ControladorMenuPrincipal:
         self.top_level = Toplevel(self.root)
         self.abrir_ventana_ventas = ControladorVentas(self.top_level)
         self.top_level.grab_set()
-        self.top_level.protocol("WM_DELETE_WINDOW",self.cerrar_modulo)
+        self.top_level.protocol("WM_DELETE_WINDOW", self.cerrar_modulo)
 
     
     # Método para minimizar menu principal

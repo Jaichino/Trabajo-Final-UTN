@@ -81,7 +81,16 @@ class ModeloInventario:
     @staticmethod
     def descontar_producto(codigo, cantidad):
 
-        query = ''' UPDATE Productos SET stock = stock - cantidad
+        query = ''' UPDATE Productos SET stock = stock - ?
+                    WHERE codigo_producto = ?
+                '''
+        
+        BaseDatos.realizar_consulta(query, (cantidad, codigo), None)
+    
+    @staticmethod
+    def devolver_productos(codigo, cantidad):
+
+        query = ''' UPDATE Productos SET stock = stock + ?
                     WHERE codigo_producto = ?
                 '''
         

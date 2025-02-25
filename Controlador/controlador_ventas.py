@@ -2,11 +2,14 @@ from tkinter import *
 from tkinter import messagebox
 from modelo.modelo_ventas import ModeloVentas
 from modelo.modelo_inventario import ModeloInventario
-from vista.vista_ventas import VentanaVentas, VentanaConsultaVentas, VentanaMiembros
+from vista.vista_ventas import (
+    VentanaVentas, VentanaConsultaVentas, VentanaMiembros
+)
 
 class ControladorVentas:
     
     def __init__(self,root):
+        # Inicializacion de ventana y modelo
         self.root = root
         self.vista_ventas = VentanaVentas(self.root)
         self.modelo_ventas = ModeloVentas()
@@ -21,23 +24,151 @@ class ControladorVentas:
         # Guardado id_cliente
         self.cliente = 0
 
+        # Seteo descuento_aplicado
+        self.descuento_aplicado = 0
+
         # Asignacion de evento a entry_codigo
         self.vista_ventas.entry_codigo.bind(
             "<KeyRelease>", 
             self.completar_detalle_producto
             )
         
-        # Asignacion de funcion agregar a carrito
+        # Asignacion de metodo agregar a carrito
         self.vista_ventas.boton_agregar_carrito.config(
             command = self.boton_agregar_carrito
         )
 
-        # Asignacion de funcion a boton validar cliente
+        # Asignacion de metodo eliminar carrito
+        self.vista_ventas.boton_eliminar_carrito.config(
+            command = self.boton_eliminar_carrito
+        )
+
+        # Asignacion de metodo finalizar venta
+        self.vista_ventas.boton_finalizar_venta.config(
+            command = self.boton_finalizar_venta
+        )
+
+        # Asignacion de metodo a boton validar cliente
         self.vista_ventas.boton_validar_cliente.config(
             command = self.boton_validar_cliente
         )
 
+        # Asignacion metodo apertura ventana consulta de ventas
+        self.vista_ventas.boton_consulta_ventas.config(
+            command = self.ventana_consulta_ventas
+        )
+
+
     
+    def ventana_consulta_ventas(self):
+        # Generacion de TopLevel para apertura de ventana
+        self.top_level = Toplevel(self.root)
+        self.abrir_consulta_ventas = VentanaConsultaVentas(self.top_level)
+        self.top_level.grab_set()
+
+        # Asignacion de metodo para filtrado de ventas
+        self.abrir_consulta_ventas.boton_filtrar.config(
+            command = self.filtrado_consulta_ventas
+        )
+
+        # Asignacion metodo eliminacion de ventas
+        self.abrir_consulta_ventas.boton_eliminar.config(
+            command = self.eliminar_venta
+        )
+    
+    def filtrado_consulta_ventas(self):
+        # Obtencion de las fechas para filtrado
+        fecha_inicio = self.abrir_consulta_ventas.fecha_desde.get()
+        fecha_fin = self.abrir_consulta_ventas.fecha_hasta.get()
+
+        # Obtencion de ventas entre fechas elegidas
+        ventas_filtro = self.modelo_ventas.consulta_ventas(
+            fecha_inicio,
+            fecha_fin
+        )
+
+        # Verificacion de existencia de resultados
+        if not ventas_filtro:
+            messagebox.showinfo(
+                'Consulta de Ventas',
+                'No se encontraron ventas entre las fechas elegidas!'
+            )
+            self.abrir_consulta_ventas.limpiar_treeview()
+            return
+
+        # Limpieza de Treeview
+        self.abrir_consulta_ventas.limpiar_treeview()
+
+        # Se agregan ventas filtradas a Treeview
+        for venta in ventas_filtro:
+            self.abrir_consulta_ventas.treeview_consulta.insert(
+                "",
+                "end",
+                text= venta[0],
+                values= (venta[1], venta[2], venta[3])
+            )
+
+
+    def eliminar_venta(self):
+        # Recuperacion de numero de venta segun elemento elegido en Treeview
+        self.seleccion = (
+            self.abrir_consulta_ventas.treeview_consulta.selection()
+        )
+
+        # Comprobacion de seleccion de una venta
+        if len(self.seleccion) != 1:
+            messagebox.showerror(
+                'Consulta de Ventas',
+                'Se debe elegir solo una venta para eliminar')
+            return
+        
+        # Obtencion numero de venta
+        nro_venta = self.abrir_consulta_ventas.treeview_consulta.item(
+            self.seleccion,
+            'text'
+        )
+
+        # Consulta eliminacion de venta
+        consulta = messagebox.askyesno(
+            'Eliminar Ventas',
+            f'Desea eliminar la venta #{nro_venta}?'
+        )
+
+        if consulta:
+            # Consulta devolucion de productos a stock
+            devolucion = messagebox.askyesno(
+                'Eliminar Ventas',
+                f'¿Devolver a stock los productos de la venta #{nro_venta}'
+            )
+
+            if devolucion:
+                productos_vendidos = (
+                    self.modelo_ventas.obtener_detalle_ventas(
+                        nro_venta
+                    )
+                )
+                # Devolucion de productos a stock
+                for producto in productos_vendidos:
+                    ModeloInventario.devolver_productos(
+                        producto[0], # Codigo
+                        producto[1]  # Cantidad vendida  
+                    )
+
+            # Eliminacion de venta
+            self.modelo_ventas.eliminar_detalle_ventas(nro_venta)
+            self.modelo_ventas.eliminar_venta(nro_venta)
+
+            # Mensaje de confirmacion
+            messagebox.showinfo(
+                'Eliminar Ventas',
+                f'Venta #{nro_venta} eliminada correctamente!'
+            )
+
+            # Actualizacion de treeview
+            self.abrir_consulta_ventas.limpiar_treeview()
+            self.filtrado_consulta_ventas()
+
+
     def completar_detalle_producto(self, event):
         '''
         Esta funcion esta vinculada a un evento del tipo <KeyRelease> en el
@@ -128,6 +259,143 @@ class ControladorVentas:
             messagebox.showerror('Error',f'Error inesperado - {e}')
 
 
+    def boton_eliminar_carrito(self):
+        # Obtencion del elemento a eliminar
+        seleccion = self.vista_ventas.treeview_carrito.selection()
+
+        # Verificacion de seleccion
+        if not seleccion:
+            messagebox.showwarning(
+                'Eliminar del Carrito',
+                'No se ha elegido ningun producto'
+            )
+            return
+        
+        # Eliminacion
+        for item in seleccion:
+            # Obtencion del monto a descontar del monto de venta
+            info = self.vista_ventas.treeview_carrito.item((item,), 'values')
+            monto_descontar = float(info[3])
+            
+            # Eliminacion del producto
+            self.vista_ventas.treeview_carrito.delete(item)
+
+            # Actualizacion monto de venta
+            self.total_pagar -= monto_descontar
+            self.total_venta -= monto_descontar
+
+            self.vista_ventas.label_total_a_pagar.config(
+                text = f'Total a pagar: ${self.total_pagar}'
+            )
+
+            self.vista_ventas.label_total_venta.config(
+                text = f'Total de venta: ${self.total_venta}'
+            )
+    
+
+    def boton_finalizar_venta(self):
+
+        # Obtencion de fecha venta
+        fecha_venta = self.vista_ventas.entry_fecha.get()
+        
+        # Obtencion de los productos del carrito en una lista
+        lista_productos = []
+        items = self.vista_ventas.treeview_carrito.get_children()
+
+        # Verificacion si hay productos en carrito
+        if not items:
+            messagebox.showwarning(
+                'Carrito Vacío',
+                'El carrito se encuentra vacío, agregar productos!'
+            )
+            return
+        
+        consulta_venta = messagebox.askyesno(
+            'Finalizacion de venta',
+            '¿Desea finalizar la venta?'
+        )
+
+        if consulta_venta:
+
+            for item in items:
+                codigo = self.vista_ventas.treeview_carrito.item(item, 'text')
+                info = self.vista_ventas.treeview_carrito.item(item, 'values')
+                cantidad = int(info[2])
+
+                # Se agrega codigo y cantidad a lista_productos
+                lista_productos.append((codigo,cantidad))
+
+            # Obtencion del numero de venta
+            info_nro_venta = self.modelo_ventas.obtener_nro_venta()
+            if info_nro_venta[0][0] is None:
+                nro_venta = 1
+            else:
+                nro_venta = info_nro_venta[0][0] + 1
+
+            # Carga de venta en tabla Ventas
+            self.modelo_ventas.nueva_venta(
+                nro_venta,
+                fecha_venta,
+                self.cliente,
+                self.total_pagar,
+                self.descuento_aplicado
+            )
+
+            # Carga productos en Detalle Ventas
+            for producto in lista_productos:
+                self.modelo_ventas.agregar_detalle_ventas(
+                    nro_venta,
+                    producto[0],
+                    producto[1]
+                )
+
+                # Se descuentan productos vendidos de Inventario
+                ModeloInventario.descontar_producto(
+                    producto[0],
+                    producto[1]
+                )
+            
+            # Mensaje de confirmacion
+            messagebox.showinfo(
+                'Ventas',
+                f'Venta nro:{nro_venta} generada correctamente!'
+            )
+
+            # Limpieza de campos y seteo de valores
+            self.vista_ventas.label_descripcion.config(
+                text= "Descripcion:"
+            )
+            
+            self.vista_ventas.label_enstock.config(
+                text= "En Stock:"
+            )
+
+            self.vista_ventas.label_total_a_pagar.config(
+                text= "Total a pagar: $"
+            )
+
+            self.vista_ventas.label_total_venta.config(
+                text= "Total de venta: $"
+            )
+
+            self.vista_ventas.label_descuentos.config(
+                text= "Descuentos: $"
+            )
+
+            self.vista_ventas.limpiar_treeview()
+
+            self.vista_ventas.limpiar_cliente()
+
+            self.vista_ventas.label_cliente_encontrado.config(
+                text= "Cliente: "
+            )
+
+            self.total_venta = 0
+            self.total_pagar = 0
+            self.cliente = 0
+            self.descuento_aplicado = 0
+
+
     def boton_validar_cliente(self):
 
         # Verificacion de que primero haya productos en carrito
@@ -148,8 +416,6 @@ class ControladorVentas:
             self.vista_ventas.label_cliente_encontrado.config(
                 text = 'Cliente: No registrado')
             
-            # Se setea descuento en $0
-            descuento = 0
             self.total_pagar = self.total_venta
             self.vista_ventas.label_descuentos.config(
                 text = 'Descuentos: $ 0'
@@ -186,16 +452,16 @@ class ControladorVentas:
                     # Se aplica si supera el monto minimo
                     monto_minimo = ModeloVentas().MONTO_MINIMO
                     
-                    if self.total_venta > monto_minimo:
-                        descuento_aplicado = descuento * self.total_venta
+                    if self.total_pagar > monto_minimo:
+                        self.descuento_aplicado = descuento * self.total_venta
                     else:
-                        descuento_aplicado = 0
+                        self.descuento_aplicado = 0
                     
                     self.vista_ventas.label_descuentos.config(
-                        text = f'Descuentos: $ {descuento_aplicado}'
+                        text = f'Descuentos: $ {self.descuento_aplicado}'
                     )
                     
-                    self.total_pagar -= descuento_aplicado
+                    self.total_pagar -= self.descuento_aplicado
                     self.vista_ventas.label_total_a_pagar.config(
                         text = f'Total a pagar: $ {self.total_pagar}'
                     )

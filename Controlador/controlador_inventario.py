@@ -64,7 +64,7 @@ class ControladorInventario:
                     '',
                     'end',
                     text = prod[0],
-                    values = (prod[1],prod[2],prod[3])
+                    values = (prod[1], prod[2], prod[3])
                 )
 
 
@@ -111,8 +111,10 @@ class ControladorInventario:
                 self.seleccion,
                 'text'
             )
-            # Inicializacion de ventana con entries llenos segun self.id_producto
-            info_producto = self.modelo_inventario.info_producto(self.id_producto)
+            # Inicializacion de ventana con entries llenos
+            info_producto = self.modelo_inventario.info_producto(
+                self.id_producto
+            )
 
             self.abrir_detalle_producto.entry_descripcion.insert(
                 0,info_producto[0][0]
@@ -152,7 +154,7 @@ class ControladorInventario:
                     '',
                     'end',
                     text = prod[0],
-                    values = (prod[1],prod[2],prod[3])
+                    values = (prod[1], prod[2], prod[3])
                 )
         
         # Limpieza de cajas y focus en entry codigo
@@ -172,7 +174,7 @@ class ControladorInventario:
                     '',
                     'end',
                     text = prod[0],
-                    values = (prod[1],prod[2],prod[3])
+                    values = (prod[1], prod[2], prod[3])
                 )
         else:
             # Mensaje de aviso y se llena treeview con todos los productos
