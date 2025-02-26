@@ -1,4 +1,12 @@
+###############################################################################
+# Importaciones
+###############################################################################
+
 from PIL import Image, ImageTk
+
+###############################################################################
+# Clase para configuracion interfaz grafica
+###############################################################################
 
 class ConfiguracionVista:
     
@@ -7,12 +15,18 @@ class ConfiguracionVista:
     configurar las vistas, a modo de facilitar los cambios a medida que 
     la aplicacion crece
     '''
-    
+
+    ###########################################################################
     # Resolucion de pantalla (coordenada en x e y)
+    ###########################################################################
+    
     res_x = 1920
     res_y = 1080
 
-    # Fuentes utilizadas
+    ###########################################################################
+    # Fuentes y colores utilizados
+    ###########################################################################
+    
     fuentes =   {'titulo': ('Arial', 20, 'bold'),
                 'boton': ('Arial', 14, 'bold'),
                 'texto': ('Arial', 14),
@@ -20,13 +34,15 @@ class ConfiguracionVista:
                 'treeview-heading':('Arial',12,'bold'),
                 'treeview':('Arial',10)
                 }
+
     
-    # Colores utilizados
     colores = {'background': '#719ef2',
                 'divisor':'#126fbb'}
 
+    ###########################################################################
+    # Diccionario de imagenes
+    ###########################################################################
 
-    # Imagenes
     imagenes = {
 
         'carrito':'imagenes/carrito.png',
@@ -43,6 +59,10 @@ class ConfiguracionVista:
 
     }
 
+    ###########################################################################
+    # Metodo formateo de imagenes
+    ###########################################################################
+    
     @staticmethod
     def formato_imagen(imagen,tipo=None):
         im = Image.open(imagen)
