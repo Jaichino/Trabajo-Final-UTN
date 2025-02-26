@@ -1,12 +1,21 @@
+###############################################################################
+# Importaciones
+###############################################################################
+
 from tkinter import Tk, Label, Button, Frame
 from PIL import Image, ImageTk
 from vista.configuracion_vista import ConfiguracionVista as cv
 
+###############################################################################
+# Ventana Menu Principal
+###############################################################################
 
 class VistaMenuPrincipal:
     
+    ###########################################################################     
     # Constructor de la ventana
     ###########################################################################
+    
     def __init__(self, root):
         self.root = root
         self.root.title("Market - Menú Principal")
@@ -19,9 +28,11 @@ class VistaMenuPrincipal:
 
 
     def widgets(self):
-
+        
+        #######################################################################
         # Referencia a imagenes
         #######################################################################
+        
         self.imagenes['ventas'] = cv.formato_imagen(
             cv.imagenes['ventas'],
             'menu'
@@ -31,8 +42,10 @@ class VistaMenuPrincipal:
             'menu'
         )
 
+        #######################################################################
         # Frames
         #######################################################################
+        
         self.frame_logo = Frame(
             self.root, width=500, height=300, bg=cv.colores['background']
         )
@@ -43,8 +56,10 @@ class VistaMenuPrincipal:
         )
         self.frame_botones.place(x=0, y=300)
 
+        #######################################################################
         # Buttons
         #######################################################################
+        
         self.boton_inventario = Button(
             self.frame_botones, 
             text="INVENTARIO", 
@@ -67,8 +82,10 @@ class VistaMenuPrincipal:
         )
         self.boton_ventas.place(relx=0.5, rely=0.65, anchor='center')
 
+        #######################################################################
         # Logo negocio
         #######################################################################
+        
         imagen_pil = Image.open('logo.png')
         imagen_pil_resize = imagen_pil.resize((250, 250))
         imagen_tk = ImageTk.PhotoImage(imagen_pil_resize)
