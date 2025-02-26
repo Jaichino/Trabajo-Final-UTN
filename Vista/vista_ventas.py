@@ -144,12 +144,12 @@ class VentanaVentas:
         self.entry_fecha.place(relx=0.1, rely=0.1)
 
         # Button
-        self.boton_validar_cliente = Button(
+        self.boton_verificar_cliente = Button(
             self.frame_finalizacion_venta,
-            text='Validar cliente',
+            text='Verificar cliente',
             font=cv.fuentes['texto']
         )
-        self.boton_validar_cliente.place(relx=0.1, rely=0.35)
+        self.boton_verificar_cliente.place(relx=0.1, rely=0.35)
 
         self.boton_agregar_carrito = Button(
             self.frame_datos_venta,

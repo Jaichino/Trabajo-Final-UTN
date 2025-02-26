@@ -5,6 +5,8 @@ from modelo.modelo_inventario import ModeloInventario
 from vista.vista_ventas import (
     VentanaVentas, VentanaConsultaVentas, VentanaMiembros
 )
+from modelo.validacion import Validaciones
+
 
 class ControladorVentas:
     
@@ -49,8 +51,8 @@ class ControladorVentas:
         )
 
         # Asignacion de metodo a boton validar cliente
-        self.vista_ventas.boton_validar_cliente.config(
-            command = self.boton_validar_cliente
+        self.vista_ventas.boton_verificar_cliente.config(
+            command = self.boton_verificar_cliente
         )
 
         # Asignacion metodo apertura ventana consulta de ventas
@@ -59,7 +61,6 @@ class ControladorVentas:
         )
 
 
-    
     def ventana_consulta_ventas(self):
         # Generacion de TopLevel para apertura de ventana
         self.top_level = Toplevel(self.root)
@@ -75,7 +76,113 @@ class ControladorVentas:
         self.abrir_consulta_ventas.boton_eliminar.config(
             command = self.eliminar_venta
         )
+
+
+    def ventana_registro_cliente(self):
+        # Creacion de TopLevel para apertura de ventana
+        self.top_level = Toplevel(self.root)
+        self.ventana_registro = VentanaMiembros(self.top_level)
+        self.top_level.grab_set()
+
+        # Asignacion evento para registrar nuevo miembro
+        self.ventana_registro.boton_guardar.config(
+            command = self.boton_nuevo_miembro
+        )
+
+        # Asignacion de evento para validacion de cliente
+        self.ventana_registro.entry_cliente.bind(
+            "<KeyRelease>",
+            self.validacion_cliente
+        )
+
+        # Asignacion de evento para validacion de dni
+        self.ventana_registro.entry_documento.bind(
+            "<KeyRelease>",
+            self.validacion_dni
+        )
+
+        # Asignacion de evento para validacion de telefono
+        self.ventana_registro.entry_telefono.bind(
+            "<KeyRelease>",
+            self.validacion_telefono
+        )
+
+        # Asignacion de evento para validacion de email
+        self.ventana_registro.entry_email.bind(
+            "<KeyRelease>",
+            self.validacion_email
+        )
+
     
+    def validacion_cliente(self, event):
+        # Obtencion de cliente
+        cliente = self.ventana_registro.entry_cliente.get()
+
+        # Validacion
+        cliente_valido = Validaciones.validacion_cliente(cliente)
+
+        if not cliente_valido:
+            self.ventana_registro.entry_cliente.config(
+                foreground = 'red'
+            )
+
+        else:
+            self.ventana_registro.entry_cliente.config(
+                foreground = 'black'
+            )
+
+
+    def validacion_dni(self, event):
+        # Obtencion del dni
+        dni = self.ventana_registro.entry_documento.get()
+
+        # Validacion
+        dni_validado = Validaciones.validacion_documento(dni)
+
+        if not dni_validado:
+            self.ventana_registro.entry_documento.config(
+                foreground = 'red'
+            )
+        else:
+            self.ventana_registro.entry_documento.config(
+                foreground = 'black'
+            )
+    
+
+    def validacion_telefono(self, event):
+        # Obtencion telefono
+        tel = self.ventana_registro.entry_telefono.get()
+
+        # Validacion
+        tel_validado = Validaciones.validacion_telefono(tel)
+
+        if not tel_validado:
+            self.ventana_registro.entry_telefono.config(
+                foreground = 'red'
+            )
+        else:
+            self.ventana_registro.entry_telefono.config(
+                foreground = 'black'
+            )
+    
+
+    def validacion_email(self, event):
+        # Obtencion email
+        email = self.ventana_registro.entry_email.get()
+
+        # Validacion
+        email_validado = Validaciones.validacion_email(email)
+
+        if not email_validado:
+            self.ventana_registro.entry_email.config(
+                foreground = 'red'
+            )
+        else:
+            self.ventana_registro.entry_email.config(
+                foreground = 'black'
+            )
+    
+
     def filtrado_consulta_ventas(self):
         # Obtencion de las fechas para filtrado
         fecha_inicio = self.abrir_consulta_ventas.fecha_desde.get()
@@ -291,7 +398,7 @@ class ControladorVentas:
             self.vista_ventas.label_total_venta.config(
                 text = f'Total de venta: ${self.total_venta}'
             )
-    
+
 
     def boton_finalizar_venta(self):
 
@@ -358,8 +465,17 @@ class ControladorVentas:
             # Mensaje de confirmacion
             messagebox.showinfo(
                 'Ventas',
-                f'Venta nro:{nro_venta} generada correctamente!'
+                f'Venta #{nro_venta} generada correctamente!'
             )
+
+            # Consulta de registro de cliente como miembro del negocio
+            if self.cliente == 0:
+                consulta_miembro = messagebox.askyesno(
+                    'Miembros',
+                    '¿Desea registrar cliente como miembro del supermercado?'
+                )
+                if consulta_miembro:
+                    self.ventana_registro_cliente()
 
             # Limpieza de campos y seteo de valores
             self.vista_ventas.label_descripcion.config(
@@ -396,8 +512,7 @@ class ControladorVentas:
             self.descuento_aplicado = 0
 
 
-    def boton_validar_cliente(self):
-
+    def boton_verificar_cliente(self):
         # Verificacion de que primero haya productos en carrito
         productos_carrito = self.vista_ventas.treeview_carrito.get_children()
         if not productos_carrito:
@@ -472,3 +587,42 @@ class ControladorVentas:
                         'Cliente Validado',
                         'Ya se ha validado al cliente'
                     )
+
+
+    def boton_nuevo_miembro(self):
+        # Se recuperan entradas de usuario
+        cliente = self.ventana_registro.entry_cliente.get()
+        dni = self.ventana_registro.entry_documento.get()
+        tel = self.ventana_registro.entry_telefono.get()
+        email = self.ventana_registro.entry_email.get()
+
+        # Validaciones
+        val_cliente = Validaciones.validacion_cliente(cliente)
+        val_dni = Validaciones.validacion_documento(dni)
+        val_tel = Validaciones.validacion_telefono(tel)
+        val_email = Validaciones.validacion_email(email)
+
+        # Verificacion
+        if not(val_cliente and val_dni and val_tel and val_email):
+            messagebox.showerror(
+                'Validacion de nuevo miembro',
+                'Verificar campos, no debe haber campos en rojo o vacios!'
+            )
+            return
+
+        # Carga de cliente
+        self.modelo_ventas.registrar_cliente(
+            cliente,
+            dni,
+            tel,
+            email
+        )
+
+        # Mensaje de confirmacion
+        messagebox.showinfo(
+            'Nuevo Miembro',
+            f'Se ha agregado a {cliente} como miembro del supermercado!'
+        )
+
+        # Se cierra ventana de nuevo miembro
+        self.top_level.destroy()
