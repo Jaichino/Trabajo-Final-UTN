@@ -11,10 +11,17 @@ class VentanaInventario:
             f"1200x600+{int((cv.res_x-1200)/2)}+{int((cv.res_y-600)/2)}"
         )
         self.root.resizable(0, 0)
+        self.img = {}
         self.widgets()
 
 
     def widgets(self):
+
+        self.img['filtrar'] = cv.formato_imagen(cv.imagenes['filtrar'])
+        self.img['sinstock'] = cv.formato_imagen(cv.imagenes['sinstock'])
+        self.img['astock'] = cv.formato_imagen(cv.imagenes['astock'])
+        self.img['editar'] = cv.formato_imagen(cv.imagenes['editar'])
+        self.img['eliminar'] = cv.formato_imagen(cv.imagenes['eliminar'])
         
         # Frame del Treeview
         self.frame_treeview = Frame(self.root, width=800, height=600)
@@ -78,16 +85,22 @@ class VentanaInventario:
         self.boton_buscar = Button(
             self.frame_funcionalidades, 
             text="Filtrar", 
-            width=10, 
-            font=cv.fuentes['boton']
+            width=150, 
+            font=cv.fuentes['boton'],
+            image=self.img['filtrar'],
+            compound='left',
+            padx=10
         )
         self.boton_buscar.place(relx=0.5, rely=0.36,anchor='center')
 
         self.boton_sin_stock = Button(
             self.frame_funcionalidades, 
             text="Sin Stock", 
-            width=10, 
-            font=cv.fuentes['boton']
+            width=150, 
+            font=cv.fuentes['boton'],
+            image=self.img['sinstock'],
+            compound='left',
+            padx=10
         )
         self.boton_sin_stock.place(relx=0.5, rely=0.45, anchor='center')
 
@@ -95,15 +108,21 @@ class VentanaInventario:
         self.boton_nuevo_producto = Button(
             self.frame_funcionalidades, 
             text="Nuevo Producto", 
-            width=20, 
-            font=cv.fuentes['boton']
+            width=200, 
+            font=cv.fuentes['boton'],
+            image=self.img['astock'],
+            compound='left',
+            padx=10
         )
         self.boton_nuevo_producto.place(relx=0.5, rely=0.6,anchor='center')
         self.boton_editar_producto = Button(
             self.frame_funcionalidades, 
             text="Editar Producto", 
-            width=20, 
-            font=cv.fuentes['boton']
+            width=200, 
+            font=cv.fuentes['boton'],
+            image=self.img['editar'],
+            compound='left',
+            padx=10
         )
         self.boton_editar_producto.place(
             relx=0.5, rely=0.75, anchor='center'
@@ -111,8 +130,11 @@ class VentanaInventario:
         self.boton_eliminar_producto = Button(
             self.frame_funcionalidades, 
             text="Eliminar Producto", 
-            width=20, 
-            font=cv.fuentes['boton']
+            width=200, 
+            font=cv.fuentes['boton'],
+            image=self.img['eliminar'],
+            compound='left',
+            padx=10
         )
         self.boton_eliminar_producto.place(
             relx=0.5, rely=0.9, anchor='center'

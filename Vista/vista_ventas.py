@@ -13,11 +13,17 @@ class VentanaVentas:
             f"1200x600+{int((cv.res_x-1200)/2)}+{int((cv.res_y-600)/2)}"
         )
         self.root.resizable(0, 0)
+        self.img = {}
         self.widgets()
 
 
     def widgets(self):
-        
+        # Referencia a imagenes
+        self.img['carrito'] = cv.formato_imagen(cv.imagenes['carrito'])
+        self.img['eliminar'] = cv.formato_imagen(cv.imagenes['eliminar'])
+        self.img['buscar'] = cv.formato_imagen(cv.imagenes['buscar'])
+        self.img['listo'] = cv.formato_imagen(cv.imagenes['listo'])
+
         # Frames
         self.frame_datos_venta = Frame(
             self.root,
@@ -147,7 +153,11 @@ class VentanaVentas:
         self.boton_verificar_cliente = Button(
             self.frame_finalizacion_venta,
             text='Verificar cliente',
-            font=cv.fuentes['texto']
+            font=cv.fuentes['texto'],
+            width=178,
+            image=self.img['buscar'],
+            compound='left',
+            padx=10
         )
         self.boton_verificar_cliente.place(relx=0.1, rely=0.35)
 
@@ -155,7 +165,10 @@ class VentanaVentas:
             self.frame_datos_venta,
             text='Agregar al carrito',
             font=cv.fuentes['boton'],
-            width=16
+            width=200,
+            image=self.img['carrito'],
+            compound='left',
+            padx=10
         )
         self.boton_agregar_carrito.place(relx=0.38, rely=0.8, anchor='center')
 
@@ -163,7 +176,10 @@ class VentanaVentas:
             self.frame_datos_venta,
             text='Eliminar del carrito',
             font=cv.fuentes['boton'],
-            width=16
+            width=200,
+            image=self.img['eliminar'],
+            compound='left',
+            padx=10
         )
         self.boton_eliminar_carrito.place(relx=0.6, rely=0.8, anchor='center')
 
@@ -171,7 +187,10 @@ class VentanaVentas:
             self.frame_datos_venta,
             text='Consultar ventas',
             font=cv.fuentes['boton'],
-            width=16
+            width=200,
+            image=self.img['buscar'],
+            compound='left',
+            padx=10
         )
         self.boton_consulta_ventas.place(relx=0.82, rely=0.8, anchor='center')
 
@@ -179,7 +198,10 @@ class VentanaVentas:
             self.frame_finalizacion_venta,
             text='Finalizar venta',
             font=cv.fuentes['boton'],
-            width=16
+            width=200,
+            image=self.img['listo'],
+            compound='left',
+            padx=10
         )
         self.boton_finalizar_venta.place(relx=0.5, rely=0.2, anchor='center')
 
@@ -254,10 +276,15 @@ class VentanaConsultaVentas:
             f"1200x600+{int((cv.res_x-1200)/2)}+{int((cv.res_y-600)/2)}"
         )
         self.root.resizable(0, 0)
+        self.img = {}
         self.widgets()
 
 
     def widgets(self):
+
+        # Referencia a imagenes
+        self.img['filtrar'] = cv.formato_imagen(cv.imagenes['filtrar'])
+        self.img['eliminar'] = cv.formato_imagen(cv.imagenes['eliminar'])
         
         # Frames
         self.frame_filtro = Frame(
@@ -310,7 +337,10 @@ class VentanaConsultaVentas:
             self.frame_filtro,
             text='Filtrar',
             font=cv.fuentes['boton'],
-            width=15
+            width=180,
+            image=self.img['filtrar'],
+            compound='left',
+            padx=10
         )
         self.boton_filtrar.place(relx=0.36, rely=0.5, anchor='center')
 
@@ -318,7 +348,10 @@ class VentanaConsultaVentas:
             self.frame_filtro,
             text='Eliminar venta',
             font=cv.fuentes['boton'],
-            width=15
+            width=180,
+            image=self.img['eliminar'],
+            compound='left',
+            padx=10
         )
         self.boton_eliminar.place(relx=0.55, rely=0.5, anchor='center')
 
@@ -369,12 +402,15 @@ class VentanaMiembros:
             f"400x350+{int((cv.res_x-400)/2)}+{int((cv.res_y-350)/2)}"
         )
         self.root.resizable(0, 0)
+        self.img = {}
         self.root.config(bg=cv.colores['background'])
         self.widgets()
     
 
     def widgets(self):
-        
+        # Referencia a imagenes
+        self.img['listo'] = cv.formato_imagen(cv.imagenes['listo'])
+
         # Label
         self.label_cliente = Label(
             self.root,
@@ -431,7 +467,13 @@ class VentanaMiembros:
 
         # Button
         self.boton_guardar = Button(
-            self.root, text='Registrar', font=cv.fuentes['boton'], width=15
+            self.root, 
+            text='Registrar', 
+            font=cv.fuentes['boton'], 
+            width=150,
+            image=self.img['listo'],
+            compound='left',
+            padx=10
         )
         self.boton_guardar.place(relx=0.5, rely=0.88, anchor='center')
     

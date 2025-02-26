@@ -12,10 +12,21 @@ class VistaMenuPrincipal:
             f"500x500+{int((cv.res_x-500)/2)}+{int((cv.res_y-500)/2)}"
         )
         self.root.resizable(0, 0)
+        self.imagenes = {}
         self.widgets()
 
 
     def widgets(self):
+
+        self.imagenes['ventas'] = cv.formato_imagen(
+            cv.imagenes['ventas'],
+            'menu'
+        )
+        self.imagenes['inventario'] = cv.formato_imagen(
+            cv.imagenes['inventario'],
+            'menu'
+        )
+
         # Frame del logo
         self.frame_logo = Frame(
             self.root, width=500, height=300, bg=cv.colores['background']
@@ -32,20 +43,24 @@ class VistaMenuPrincipal:
         self.boton_inventario = Button(
             self.frame_botones, 
             text="INVENTARIO", 
-            width=25,
-            height=2, 
-            font=cv.fuentes['boton']
+            width=200,
+            compound='left',
+            font=cv.fuentes['boton'],
+            image=self.imagenes['inventario'],
+            padx=20
         )
-        self.boton_inventario.place(relx=0.5, rely=0.2, anchor='center')
+        self.boton_inventario.place(relx=0.5, rely=0.25, anchor='center')
 
         self.boton_ventas = Button(
             self.frame_botones, 
             text="VENTAS", 
-            width=25,
-            height=2, 
-            font=cv.fuentes['boton']
+            width=200,
+            font=cv.fuentes['boton'],
+            image=self.imagenes['ventas'],
+            compound='left',
+            padx=20
         )
-        self.boton_ventas.place(relx=0.5, rely=0.6, anchor='center')
+        self.boton_ventas.place(relx=0.5, rely=0.65, anchor='center')
 
         # Logo del negocio
         imagen_pil = Image.open('logo.png')

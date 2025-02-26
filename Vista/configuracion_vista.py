@@ -1,3 +1,4 @@
+from PIL import Image, ImageTk
 
 class ConfiguracionVista:
     
@@ -23,4 +24,34 @@ class ConfiguracionVista:
     # Colores utilizados
     colores = {'background': '#719ef2',
                 'divisor':'#126fbb'}
+
+
+    # Imagenes
+    imagenes = {
+
+        'carrito':'imagenes/carrito.png',
+        'eliminar':'imagenes/eliminar.png',
+        'filtrar':'imagenes/filtrar.png',
+        'guardar':'imagenes/guardar.png',
+        'astock':'imagenes/ingresar_stock.png',
+        'inventario':'imagenes/inventario.png',
+        'listo':'imagenes/listo.png',
+        'ventas':'imagenes/ventas.png',
+        'sinstock':'imagenes/sin_stock.png',
+        'editar':'imagenes/modificar.png',
+        'buscar':'imagenes/buscar.png'
+
+    }
+
+    @staticmethod
+    def formato_imagen(imagen,tipo=None):
+        im = Image.open(imagen)
+
+        if tipo is not None:
+            im_res = im.resize((50,50))
+        else:
+            im_res = im.resize((30,30))
+
+        im_tk = ImageTk.PhotoImage(im_res)
+        return im_tk
 
