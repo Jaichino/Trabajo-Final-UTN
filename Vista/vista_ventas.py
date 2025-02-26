@@ -1,8 +1,16 @@
+###############################################################################
+# Importaciones
+###############################################################################
+
 from tkinter import Tk, Frame, Label, Entry, Button
 from tkinter import ttk
 from tkcalendar import DateEntry
 from datetime import date
 from vista.configuracion_vista import ConfiguracionVista as cv
+
+###############################################################################
+# Ventana Principal de Ventas
+###############################################################################
 
 class VentanaVentas:
     
@@ -18,13 +26,20 @@ class VentanaVentas:
 
 
     def widgets(self):
+        
+        #######################################################################
         # Referencia a imagenes
+        #######################################################################
+        
         self.img['carrito'] = cv.formato_imagen(cv.imagenes['carrito'])
         self.img['eliminar'] = cv.formato_imagen(cv.imagenes['eliminar'])
         self.img['buscar'] = cv.formato_imagen(cv.imagenes['buscar'])
         self.img['listo'] = cv.formato_imagen(cv.imagenes['listo'])
-
+        
+        #######################################################################
         # Frames
+        #######################################################################
+        
         self.frame_datos_venta = Frame(
             self.root,
             width=1200,
@@ -44,7 +59,10 @@ class VentanaVentas:
         )
         self.frame_finalizacion_venta.place(x=0, y=450)
 
+        #######################################################################
         # Labels
+        #######################################################################
+        
         self.label_cliente = Label(
             self.frame_finalizacion_venta,
             text="Cliente",
@@ -125,7 +143,10 @@ class VentanaVentas:
         )
         self.label_total_a_pagar.place(relx=0.7, rely=0.75)
 
-        # Entry
+        #######################################################################
+        # Entries
+        #######################################################################
+        
         self.entry_cliente = Entry(
             self.frame_finalizacion_venta,
             font=cv.fuentes['texto'],
@@ -149,7 +170,10 @@ class VentanaVentas:
         self.entry_fecha.insert(0,date.strftime(date.today(), "%d-%m-%Y"))
         self.entry_fecha.place(relx=0.1, rely=0.1)
 
-        # Button
+        #######################################################################
+        # Buttons
+        #######################################################################
+        
         self.boton_verificar_cliente = Button(
             self.frame_finalizacion_venta,
             text='Verificar cliente',
@@ -205,7 +229,10 @@ class VentanaVentas:
         )
         self.boton_finalizar_venta.place(relx=0.5, rely=0.2, anchor='center')
 
+        #######################################################################
         # Treeview
+        #######################################################################
+        
         self.treeview_carrito = ttk.Treeview(
             self.frame_treeview_carrito,
             columns=('col1','col2','col3','col4'),
@@ -236,14 +263,20 @@ class VentanaVentas:
 
         self.treeview_carrito.grid(row=0, column=0, sticky='nsew')
 
-        # Style para Treeview
+        #######################################################################
+        # Styles
+        #######################################################################
+        
         self.style = ttk.Style(self.frame_treeview_carrito)
         self.style.configure(
             "Treeview.Heading",font=cv.fuentes['treeview-heading']
         )
         self.style.configure("Treeview", font=cv.fuentes['treeview'])
 
+        #######################################################################
         # Scrollbar
+        #######################################################################
+        
         self.scrollbar = ttk.Scrollbar(
             self.frame_treeview_carrito,
             orient='vertical',
@@ -252,23 +285,34 @@ class VentanaVentas:
         self.treeview_carrito.config(yscrollcommand=self.scrollbar.set)
         self.scrollbar.grid(row=0, column=1, sticky='ns')
     
-
+    ###########################################################################
+    # Metodos limpieza de campos
+    ###########################################################################
+    
     def limpiar_cajas(self):
         self.entry_cantidad.delete(0, 'end')
         self.entry_codigo.delete(0, 'end')
     
-    
     def limpiar_cliente(self):
         self.entry_cliente.delete(0, 'end')
     
-
+    ###########################################################################
+    # Metodo limpieza de Treeview
+    ###########################################################################
+    
     def limpiar_treeview(self):
         for child in self.treeview_carrito.get_children():
             self.treeview_carrito.delete(child)
 
+###############################################################################
+# Ventana Consulta de Ventas
+###############################################################################
 
 class VentanaConsultaVentas:
 
+    ###########################################################################
+    # Constructor de la ventana
+    ###########################################################################
     def __init__(self, root):
         self.root = root
         self.root.title("Market - Consulta de ventas")
@@ -281,12 +325,18 @@ class VentanaConsultaVentas:
 
 
     def widgets(self):
-
+        
+        #######################################################################
         # Referencia a imagenes
+        #######################################################################
+        
         self.img['filtrar'] = cv.formato_imagen(cv.imagenes['filtrar'])
         self.img['eliminar'] = cv.formato_imagen(cv.imagenes['eliminar'])
         
+        #######################################################################
         # Frames
+        #######################################################################
+        
         self.frame_filtro = Frame(
             self.root,
             width=1200,
@@ -298,7 +348,10 @@ class VentanaConsultaVentas:
         self.frame_treeview = Frame(self.root, width=1200, height=450)
         self.frame_treeview.place(x=2, y=150)
 
-        # Label
+        #######################################################################
+        # Labels
+        #######################################################################
+        
         self.label_inicio = Label(
             self.frame_filtro,
             text="Desde",
@@ -315,7 +368,10 @@ class VentanaConsultaVentas:
         )
         self.label_final.place(relx=0.01, rely=0.6)
 
+        #######################################################################
         # DateEntry
+        #######################################################################
+        
         self.fecha_desde = DateEntry(
             self.frame_filtro,
             date_pattern="dd-mm-yyyy",
@@ -332,7 +388,10 @@ class VentanaConsultaVentas:
         )
         self.fecha_hasta.place(relx=0.09, rely=0.6)
 
-        # Button
+        #######################################################################
+        # Buttons
+        #######################################################################
+        
         self.boton_filtrar = Button(
             self.frame_filtro,
             text='Filtrar',
@@ -355,7 +414,10 @@ class VentanaConsultaVentas:
         )
         self.boton_eliminar.place(relx=0.55, rely=0.5, anchor='center')
 
+        #######################################################################
         # Treeview
+        #######################################################################
+        
         self.treeview_consulta = ttk.Treeview(
             self.frame_treeview, columns=('col1','col2','col3'), height=21)
         
@@ -371,13 +433,20 @@ class VentanaConsultaVentas:
 
         self.treeview_consulta.grid(row=0, column=0, sticky='nsew')
 
+        #######################################################################
+        # Styles
+        #######################################################################
+        
         self.style = ttk.Style(self.frame_treeview)
         self.style.configure(
             "Treeview.Heading", font=cv.fuentes['treeview-heading']
         )
         self.style.configure("Treeview", font=cv.fuentes['treeview'])
 
+        #######################################################################
         # Scrollbar
+        #######################################################################
+        
         self.scrollbar = ttk.Scrollbar(
             self.frame_treeview,
             orient='vertical',
@@ -385,16 +454,25 @@ class VentanaConsultaVentas:
         )
         self.treeview_consulta.config(yscrollcommand=self.scrollbar.set)
         self.scrollbar.grid(row=0, column=1, sticky='ns')
-    
 
+    ###########################################################################
+    # Metodo limpieza Treeview
+    ###########################################################################
+    
     def limpiar_treeview(self):
         for child in self.treeview_consulta.get_children():
             self.treeview_consulta.delete(child)
 
+###############################################################################
+# Ventana creacion de Miembros
+###############################################################################
 
 class VentanaMiembros:
 
-    # Constructor de la ventana de ingreso de nuevos miembros
+    ###########################################################################
+    # Constructor de la ventana
+    ###########################################################################
+    
     def __init__(self,root):
         self.root = root
         self.root.title("Market - Registro nuevo miembro")
@@ -408,10 +486,17 @@ class VentanaMiembros:
     
 
     def widgets(self):
+        
+        #######################################################################
         # Referencia a imagenes
+        #######################################################################
+        
         self.img['listo'] = cv.formato_imagen(cv.imagenes['listo'])
 
-        # Label
+        #######################################################################
+        # Labels
+        #######################################################################
+        
         self.label_cliente = Label(
             self.root,
             text='Cliente',
@@ -444,7 +529,10 @@ class VentanaMiembros:
         )
         self.label_email.place(relx=0.05, rely=0.65)
 
-        # Entry
+        #######################################################################
+        # Entries
+        #######################################################################
+        
         self.entry_cliente = Entry(
             self.root, font=cv.fuentes['texto'], width=20
         )
@@ -465,7 +553,10 @@ class VentanaMiembros:
         )
         self.entry_email.place(relx=0.35, rely=0.65)
 
-        # Button
+        #######################################################################
+        # Buttons
+        #######################################################################
+        
         self.boton_guardar = Button(
             self.root, 
             text='Registrar', 
@@ -477,9 +568,13 @@ class VentanaMiembros:
         )
         self.boton_guardar.place(relx=0.5, rely=0.88, anchor='center')
     
-
+    ###########################################################################
+    # Metodo limpieza de campos
+    ###########################################################################
+    
     def limpiar_cajas(self):
         self.entry_cliente.delete(0, 'end')
         self.entry_documento.delete(0, 'end')
         self.entry_email.delete(0, 'end')
         self.entry_telefono.delete(0, 'end')
+        
