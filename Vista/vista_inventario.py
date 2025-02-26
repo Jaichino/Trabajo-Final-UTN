@@ -1,11 +1,21 @@
+###############################################################################
+# Importaciones
+###############################################################################
+
 from tkinter import Tk, Label, Button, Frame, Entry
 from tkinter import ttk
 from vista.configuracion_vista import ConfiguracionVista as cv
 
+###############################################################################
+# Ventana Principal Inventario
+###############################################################################
+
 class VentanaInventario:
-    
+
+    ###########################################################################
     # Constructor de la ventana
     ###########################################################################
+    
     def __init__(self, root):
         self.root = root
         self.root.title("Market - Inventario")
@@ -18,17 +28,21 @@ class VentanaInventario:
 
 
     def widgets(self):
-        
+
+        #######################################################################
         # Referencia a imagenes
         #######################################################################
+        
         self.img['filtrar'] = cv.formato_imagen(cv.imagenes['filtrar'])
         self.img['sinstock'] = cv.formato_imagen(cv.imagenes['sinstock'])
         self.img['astock'] = cv.formato_imagen(cv.imagenes['astock'])
         self.img['editar'] = cv.formato_imagen(cv.imagenes['editar'])
         self.img['eliminar'] = cv.formato_imagen(cv.imagenes['eliminar'])
 
+        #######################################################################
         # Frames
         #######################################################################
+        
         self.frame_treeview = Frame(self.root, width=800, height=600)
         self.frame_treeview.place(x=1, y=0)
 
@@ -46,8 +60,10 @@ class VentanaInventario:
         
         self.frame_linea.place(x=0, y=300)
 
+        #######################################################################
         # Labels
         #######################################################################
+        
         self.label_funcionalidades = Label(
             self.frame_funcionalidades,
             text="BÚSQUEDA",
@@ -74,8 +90,10 @@ class VentanaInventario:
         )
         self.label_descripcion.place(relx=0.05, rely=0.22)
 
+        #######################################################################
         # Entries
         #######################################################################
+        
         self.entry_codigo = Entry(
             self.frame_funcionalidades,
             font=cv.fuentes['texto'], 
@@ -88,8 +106,10 @@ class VentanaInventario:
         )
         self.entry_descripcion.place(relx=0.4, rely=0.22)
 
+        #######################################################################
         # Buttons
         #######################################################################
+        
         self.boton_buscar = Button(
             self.frame_funcionalidades, 
             text="Filtrar", 
@@ -149,8 +169,10 @@ class VentanaInventario:
             relx=0.5, rely=0.9, anchor='center'
         )
 
+        #######################################################################
         # Treeview
         #######################################################################
+        
         self.treeview_inventario = ttk.Treeview(
             self.frame_treeview,
             columns=('col1','col2','col3'),
@@ -184,8 +206,10 @@ class VentanaInventario:
 
         self.treeview_inventario.grid(row=0, column=0, sticky='nswe')
 
+        #######################################################################
         # Scrollbar
         #######################################################################
+        
         self.scrollbar = ttk.Scrollbar(
             self.frame_treeview,
             orient='vertical',
@@ -193,24 +217,33 @@ class VentanaInventario:
         )
         self.treeview_inventario.config(yscrollcommand=self.scrollbar.set)
         self.scrollbar.grid(row=0, column=1, sticky='ns')
-
+        
+    ###########################################################################
     # Metodo limpieza de campos
     ###########################################################################
+    
     def limpiar_cajas(self):
         self.entry_descripcion.delete(0, 'end')
         self.entry_codigo.delete(0, 'end')
-    
+
+    ###########################################################################
     # Metodo limpieza Treeview
     ###########################################################################
+    
     def limpiar_treeview(self):
         for child in self.treeview_inventario.get_children():
             self.treeview_inventario.delete(child)
 
+###############################################################################
+# Ventana Detalle de Producto
+###############################################################################
 
 class VentanaDetalleProducto:
-
+    
+    ###########################################################################
     # Constructor de la ventana
     ###########################################################################
+    
     def __init__(self,root):
         self.root = root
         self.root.title("Inventario - Ventana de Producto")
@@ -225,12 +258,16 @@ class VentanaDetalleProducto:
     
     def widgets(self):
         
+        #######################################################################    
         # Referencia a imagenes
         #######################################################################
-        self.img['guardar'] = cv.formato_imagen(cv.imagenes['guardar'])
         
+        self.img['guardar'] = cv.formato_imagen(cv.imagenes['guardar'])
+
+        #######################################################################
         # Labels
         #######################################################################
+        
         self.label_descripcion = Label(
             self.root,
             text='Descripción',
@@ -255,8 +292,10 @@ class VentanaDetalleProducto:
         )
         self.label_cantidad.place(relx=0.05, rely=0.55)
 
+        #######################################################################
         # Entries
         #######################################################################
+        
         self.entry_descripcion = Entry(
             self.root, font=cv.fuentes['texto'],width=20
         )
@@ -272,8 +311,10 @@ class VentanaDetalleProducto:
         )
         self.entry_cantidad.place(relx=0.35, rely=0.55)
 
+        #######################################################################
         # Buttons
         #######################################################################
+        
         self.boton_guardar = Button(
             self.root,
             text='Guardar',
@@ -285,10 +326,11 @@ class VentanaDetalleProducto:
         )
         self.boton_guardar.place(relx=0.5, rely=0.85, anchor='center')
 
+    ###########################################################################
     # Metodo limpieza de campos
     ###########################################################################
+    
     def limpiar_cajas(self):
         self.entry_cantidad.delete(0, 'end')
         self.entry_descripcion.delete(0, 'end')
         self.entry_precio.delete(0, 'end')
-        
