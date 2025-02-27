@@ -1,3 +1,7 @@
+##############################################################################
+# Importaciones
+##############################################################################
+
 from tkinter import *
 from tkinter import messagebox
 from modelo.modelo_ventas import ModeloVentas
@@ -7,10 +11,18 @@ from vista.vista_ventas import (
 )
 from modelo.validacion import Validaciones
 
+##############################################################################
+# Clase controlador de ventas
+##############################################################################
 
 class ControladorVentas:
     
+    ##########################################################################
+    # Constructor del controlador
+    ##########################################################################
+
     def __init__(self,root):
+
         # Inicializacion de ventana y modelo
         self.root = root
         self.vista_ventas = VentanaVentas(self.root)
@@ -59,7 +71,10 @@ class ControladorVentas:
         self.vista_ventas.boton_consulta_ventas.config(
             command = self.ventana_consulta_ventas
         )
-
+    
+    ##########################################################################
+    # Metodos
+    ##########################################################################
 
     def ventana_consulta_ventas(self):
         # Generacion de TopLevel para apertura de ventana
@@ -212,7 +227,7 @@ class ControladorVentas:
                 "",
                 "end",
                 text= venta[0],
-                values= (venta[1], venta[2], venta[3])
+                values= (venta[1], venta[2], f'$ {venta[3]}')
             )
 
 
@@ -342,7 +357,7 @@ class ControladorVentas:
                 "",
                 "end",
                 text = codigo,
-                values = (descripcion, precio, cantidad, subtotal)
+                values = (descripcion, f'$ {precio}', cantidad, f' $ {subtotal}')
             )
 
             # Limpieza de cajas y foco en entry_codigo

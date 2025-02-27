@@ -1,12 +1,24 @@
+##############################################################################
+# Importaciones
+##############################################################################
+
 from tkinter import *
 from tkinter import messagebox
 from modelo.modelo_inventario import ModeloInventario
 from vista.vista_inventario import VentanaInventario, VentanaDetalleProducto
 
+##############################################################################
+# Clase Controlador Inventario
+##############################################################################
 
 class ControladorInventario:
 
+    ##########################################################################
+    # Constructor del controlador
+    ##########################################################################
+
     def __init__(self,root):
+
         self.root = root
         self.vista_inventario = VentanaInventario(self.root)
         self.modelo_inventario = ModeloInventario()
@@ -49,6 +61,9 @@ class ControladorInventario:
             command = self.boton_eliminar_producto
         )
 
+    ##########################################################################
+    # Metodos 
+    ##########################################################################
 
     def llenar_treeview_productos(self):
         # Obtencion de lista de productos
@@ -64,7 +79,7 @@ class ControladorInventario:
                     '',
                     'end',
                     text = prod[0],
-                    values = (prod[1], prod[2], prod[3])
+                    values = (prod[1], f'$ {prod[2]}', prod[3])
                 )
 
 
@@ -154,7 +169,7 @@ class ControladorInventario:
                     '',
                     'end',
                     text = prod[0],
-                    values = (prod[1], prod[2], prod[3])
+                    values = (prod[1], f'$ {prod[2]}', prod[3])
                 )
         
         # Limpieza de cajas y focus en entry codigo
@@ -174,7 +189,7 @@ class ControladorInventario:
                     '',
                     'end',
                     text = prod[0],
-                    values = (prod[1], prod[2], prod[3])
+                    values = (prod[1], f'$ {prod[2]}', prod[3])
                 )
         else:
             # Mensaje de aviso y se llena treeview con todos los productos

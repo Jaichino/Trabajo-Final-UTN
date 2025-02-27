@@ -1,6 +1,18 @@
+##############################################################################
+# Importaciones
+##############################################################################
+
 from modelo.database import BaseDatos
 
+##############################################################################
+# Clase modelo de inventario
+##############################################################################
+
 class ModeloInventario:
+
+    ##########################################################################
+    # Metodos
+    ##########################################################################
 
     @staticmethod
     def mostrar_productos():
@@ -20,7 +32,12 @@ class ModeloInventario:
 
     
     @staticmethod
-    def modificar_producto(descripcion, precio_unitario, stock, codigo_producto):
+    def modificar_producto(
+        descripcion, 
+        precio_unitario, 
+        stock, 
+        codigo_producto
+    ):
 
         query = ''' UPDATE Productos SET descripcion = ?, 
                     precio_unitario = ?, 
@@ -29,10 +46,13 @@ class ModeloInventario:
                 '''
         
         BaseDatos.realizar_consulta(query,
-                                    (descripcion,precio_unitario,stock,codigo_producto),
+                                    (descripcion,
+                                    precio_unitario,
+                                    stock,
+                                    codigo_producto),
                                     None)
 
-    
+
     @staticmethod
     def eliminar_producto(codigo_producto):
         query = ''' UPDATE Productos SET estado = 'False'
@@ -40,7 +60,7 @@ class ModeloInventario:
                 '''
 
         BaseDatos.realizar_consulta(query, (codigo_producto,), None)
-    
+
 
     @staticmethod
     def filtrar_productos(codigo=None, descripcion=None):
@@ -58,7 +78,7 @@ class ModeloInventario:
         query += ' ORDER BY descripcion'
 
         return BaseDatos.realizar_consulta(query, params, 'SELECT')
-        
+
 
     @staticmethod
     def productos_sin_stock():
@@ -66,8 +86,8 @@ class ModeloInventario:
                     WHERE stock = ? AND estado = ?'''
 
         return BaseDatos.realizar_consulta(query, (0,'True'), 'SELECT')
-    
-    
+
+
     @staticmethod
     def info_producto(codigo, estado='True'):
 
@@ -78,6 +98,7 @@ class ModeloInventario:
         
         return BaseDatos.realizar_consulta(query, (estado,codigo), 'SELECT')
 
+
     @staticmethod
     def descontar_producto(codigo, cantidad):
 
@@ -86,7 +107,8 @@ class ModeloInventario:
                 '''
         
         BaseDatos.realizar_consulta(query, (cantidad, codigo), None)
-    
+
+
     @staticmethod
     def devolver_productos(codigo, cantidad):
 

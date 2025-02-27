@@ -1,7 +1,15 @@
+##############################################################################
+# Importaciones
+##############################################################################
+
 from tkinter import *
 from vista.vista_menuprincipal import VistaMenuPrincipal
 from controlador.controlador_inventario import ControladorInventario
 from controlador.controlador_ventas import ControladorVentas
+
+##############################################################################
+# Clase controlador del menu principal
+##############################################################################
 
 class ControladorMenuPrincipal:
 
@@ -11,7 +19,12 @@ class ControladorMenuPrincipal:
     de inventario).
     """
 
+    ##########################################################################
+    # Constructor del controlador
+    ##########################################################################
+
     def __init__(self,root):
+        
         self.root = root
         self.vista = VistaMenuPrincipal(root)
 
@@ -20,6 +33,10 @@ class ControladorMenuPrincipal:
             command=self.iniciar_modulo_inventario
         )
         self.vista.boton_ventas.config(command=self.iniciar_modulo_ventas)
+
+    ##########################################################################
+    # Metodos
+    ##########################################################################
 
     """
     Metodos para iniciar los modulos de inventario y ventas, primero se 
@@ -46,12 +63,12 @@ class ControladorMenuPrincipal:
         self.top_level.protocol("WM_DELETE_WINDOW", self.cerrar_modulo)
 
     
-    # Método para minimizar menu principal
+    # Metodo para minimizar menu principal
     def minimizar_menu_principal(self):
         self.root.iconify()
 
 
-    # Método para cerrar modulo y reabrir menu principal
+    # Metodo para cerrar modulo y reabrir menu principal
     def cerrar_modulo(self):
         self.top_level.destroy()
         self.root.deiconify()

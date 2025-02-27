@@ -1,6 +1,18 @@
+##############################################################################
+# Importaciones
+##############################################################################
+
 import re
 
+##############################################################################
+# Clase validaciones de campos
+##############################################################################
+
 class Validaciones:
+
+    ##########################################################################
+    # Metodos
+    ##########################################################################
     
     @staticmethod
     def validacion_cliente(cliente):
@@ -14,15 +26,15 @@ class Validaciones:
         patron = r"^\d{2,}\-\d{6,}$"
         coincidencia = re.match(patron, telefono)
         return coincidencia
-    
+
 
     @staticmethod
     def validacion_email(email):
         patron = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         coincidencia = re.match(patron, email)
         return coincidencia
-    
-    
+
+
     @staticmethod
     def validacion_documento(documento):
         patron = r"^\d{8}$"
