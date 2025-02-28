@@ -67,7 +67,7 @@ class VentanaInventario:
         
         self.label_funcionalidades = Label(
             self.frame_funcionalidades,
-            text="BÚSQUEDA",
+            text="BUSQUEDA",
             font=cv.fuentes['titulo'],
             bg=cv.colores['background']
         )
@@ -116,6 +116,8 @@ class VentanaInventario:
             text="Filtrar", 
             width=150, 
             font=cv.fuentes['boton'],
+            border=2,
+            relief='solid',
             image=self.img['filtrar'],
             compound='left',
             padx=10
@@ -127,6 +129,8 @@ class VentanaInventario:
             text="Sin Stock", 
             width=150, 
             font=cv.fuentes['boton'],
+            border=2,
+            relief='solid',
             image=self.img['sinstock'],
             compound='left',
             padx=10
@@ -138,6 +142,8 @@ class VentanaInventario:
             text="Nuevo Producto", 
             width=200, 
             font=cv.fuentes['boton'],
+            border=2,
+            relief='solid',
             image=self.img['astock'],
             compound='left',
             padx=10
@@ -149,6 +155,8 @@ class VentanaInventario:
             text="Editar Producto", 
             width=200, 
             font=cv.fuentes['boton'],
+            border=2,
+            relief='solid',
             image=self.img['editar'],
             compound='left',
             padx=10
@@ -162,6 +170,8 @@ class VentanaInventario:
             text="Eliminar Producto", 
             width=200, 
             font=cv.fuentes['boton'],
+            border=2,
+            relief='solid',
             image=self.img['eliminar'],
             compound='left',
             padx=10
@@ -322,6 +332,8 @@ class VentanaDetalleProducto:
             text='Guardar',
             font=cv.fuentes['boton'],
             width=150,
+            border=2,
+            relief='solid',
             image=self.img['guardar'],
             compound='left',
             padx=10

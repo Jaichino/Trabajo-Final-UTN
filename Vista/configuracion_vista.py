@@ -55,7 +55,8 @@ class ConfiguracionVista:
         'ventas':'imagenes/ventas.png',
         'sinstock':'imagenes/sin_stock.png',
         'editar':'imagenes/modificar.png',
-        'buscar':'imagenes/buscar.png'
+        'buscar':'imagenes/buscar.png',
+        'config':'imagenes/configuracion.png'
 
     }
 

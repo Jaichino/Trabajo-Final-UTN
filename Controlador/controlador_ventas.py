@@ -7,7 +7,10 @@ from tkinter import messagebox
 from modelo.modelo_ventas import ModeloVentas
 from modelo.modelo_inventario import ModeloInventario
 from vista.vista_ventas import (
-    VentanaVentas, VentanaConsultaVentas, VentanaMiembros
+    VentanaVentas, 
+    VentanaConsultaVentas, 
+    VentanaMiembros, 
+    VentanaConfiguracionDescuentos
 )
 from modelo.validacion import Validaciones
 
@@ -71,11 +74,41 @@ class ControladorVentas:
         self.vista_ventas.boton_consulta_ventas.config(
             command = self.ventana_consulta_ventas
         )
+
+        # Asignacion metodo apertura ventana configuraciones
+        self.vista_ventas.boton_configuracion.config(
+            command = self.ventana_configuracion
+        )
     
     ##########################################################################
     # Metodos
     ##########################################################################
 
+    def ventana_configuracion(self):
+        # Generacion de TopLevel para apertura de ventana
+        self.top_level = Toplevel(self.root)
+        self.abrir_configuracion = VentanaConfiguracionDescuentos(
+            self.top_level
+        )
+        self.top_level.grab_set()
+
+        # Iniciacion de entries con valores actuales de descuento y monto
+        self.abrir_configuracion.entry_descuento.insert(
+            0,
+            self.modelo_ventas.descuento()[0][0]
+        )
+
+        self.abrir_configuracion.entry_monto.insert(
+            0,
+            self.modelo_ventas.monto_minimo()[0][0]
+        )
+
+        # Asignacion de metodo a boton guardado de descuento
+        self.abrir_configuracion.boton_guardar.config(
+            command = self.actualizar_descuento_monto
+        )
+
+    
     def ventana_consulta_ventas(self):
         # Generacion de TopLevel para apertura de ventana
         self.top_level = Toplevel(self.root)
@@ -577,10 +610,10 @@ class ControladorVentas:
                     )
                     
                     # Se calcula descuento y se aplica
-                    descuento = ModeloVentas().DESCUENTO_MIEMBRO
+                    descuento = ModeloVentas().descuento()[0][0]
                     
                     # Se aplica si supera el monto minimo
-                    monto_minimo = ModeloVentas().MONTO_MINIMO
+                    monto_minimo = ModeloVentas().monto_minimo()[0][0]
                     
                     if self.total_pagar > monto_minimo:
                         self.descuento_aplicado = descuento * self.total_venta
@@ -641,3 +674,43 @@ class ControladorVentas:
 
         # Se cierra ventana de nuevo miembro
         self.top_level.destroy()
+    
+
+    def actualizar_descuento_monto(self):
+        try:
+            # Recuperacion valores de entry
+            descuento = float(self.abrir_configuracion.entry_descuento.get())
+            monto = int(self.abrir_configuracion.entry_monto.get())
+
+            if descuento >= 1 or descuento < 0:
+                messagebox.showerror(
+                    'Error',
+                    'El descuento debe ser un numero entre 0 y 1'
+                )
+                return
+            
+            # Verificacion llenado de campos
+            if descuento == '' or monto == '':
+                messagebox.showerror(
+                    'Error',
+                    'Se deben completar los campos'
+                )
+                return
+            
+            # Actualizacion de campos
+            self.modelo_ventas.nuevo_descuento_monto(descuento, monto)
+
+            # Mensaje de confirmacion y cerrado de ventana
+            messagebox.showinfo(
+                'Configuracion de descuentos',
+                'Informacion de descuentos actualizada'
+            )
+
+            self.top_level.destroy()
+
+        except ValueError:
+            messagebox.showerror(
+                    'Error',
+                    'Error en los campos'
+                )
+            

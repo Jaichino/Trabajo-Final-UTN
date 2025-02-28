@@ -17,6 +17,7 @@ class ControladorMenuPrincipal:
     En el controlador del menu principal se llevan a cabo las aperturas
     de los respectivos modulos de la aplicacion (modulo de ventas y modulo
     de inventario).
+
     """
 
     ##########################################################################
@@ -62,7 +63,7 @@ class ControladorMenuPrincipal:
         self.top_level.grab_set()
         self.top_level.protocol("WM_DELETE_WINDOW", self.cerrar_modulo)
 
-    
+
     # Metodo para minimizar menu principal
     def minimizar_menu_principal(self):
         self.root.iconify()

@@ -36,6 +36,7 @@ class VentanaVentas:
         self.img['eliminar'] = cv.formato_imagen(cv.imagenes['eliminar'])
         self.img['buscar'] = cv.formato_imagen(cv.imagenes['buscar'])
         self.img['listo'] = cv.formato_imagen(cv.imagenes['listo'])
+        self.img['config'] = cv.formato_imagen(cv.imagenes['config'])
         
         ######################################################################
         # Frames
@@ -180,6 +181,8 @@ class VentanaVentas:
             text='Verificar cliente',
             font=cv.fuentes['boton'],
             width=178,
+            border=2,
+            relief='solid',
             image=self.img['buscar'],
             compound='left',
             padx=10
@@ -191,6 +194,8 @@ class VentanaVentas:
             text='Agregar al carrito',
             font=cv.fuentes['boton'],
             width=200,
+            border=2,
+            relief='solid',
             image=self.img['carrito'],
             compound='left',
             padx=10
@@ -202,6 +207,8 @@ class VentanaVentas:
             text='Eliminar del carrito',
             font=cv.fuentes['boton'],
             width=200,
+            border=2,
+            relief='solid',
             image=self.img['eliminar'],
             compound='left',
             padx=10
@@ -213,6 +220,8 @@ class VentanaVentas:
             text='Consultar ventas',
             font=cv.fuentes['boton'],
             width=200,
+            border=2,
+            relief='solid',
             image=self.img['buscar'],
             compound='left',
             padx=10
@@ -224,11 +233,23 @@ class VentanaVentas:
             text='Finalizar venta',
             font=cv.fuentes['boton'],
             width=200,
+            border=2,
+            relief='solid',
             image=self.img['listo'],
             compound='left',
             padx=10
         )
         self.boton_finalizar_venta.place(relx=0.5, rely=0.2, anchor='center')
+
+        self.boton_configuracion = Button(
+        self.frame_datos_venta,
+        background=cv.colores['background'],
+        borderwidth=0,
+        activebackground=cv.colores['background'],
+        image=self.img['config']
+        )
+        self.boton_configuracion.place(relx=0.95, rely=0.1)
+
 
         ######################################################################
         # Treeview
@@ -399,6 +420,8 @@ class VentanaConsultaVentas:
             text='Filtrar',
             font=cv.fuentes['boton'],
             width=180,
+            border=2,
+            relief='solid',
             image=self.img['filtrar'],
             compound='left',
             padx=10
@@ -410,6 +433,8 @@ class VentanaConsultaVentas:
             text='Eliminar venta',
             font=cv.fuentes['boton'],
             width=180,
+            border=2,
+            relief='solid',
             image=self.img['eliminar'],
             compound='left',
             padx=10
@@ -565,6 +590,8 @@ class VentanaMiembros:
             text='Registrar', 
             font=cv.fuentes['boton'], 
             width=150,
+            border=2,
+            relief='solid',
             image=self.img['listo'],
             compound='left',
             padx=10
@@ -580,4 +607,86 @@ class VentanaMiembros:
         self.entry_documento.delete(0, 'end')
         self.entry_email.delete(0, 'end')
         self.entry_telefono.delete(0, 'end')
+
+
+##############################################################################
+# Ventana Detalle de Producto
+##############################################################################
+
+class VentanaConfiguracionDescuentos:
+    
+    ##########################################################################
+    # Constructor de la ventana
+    ##########################################################################
+    
+    def __init__(self,root):
+        self.root = root
+        self.root.title("Descuentos - Config")
+        self.root.geometry(
+            f"300x200+{int((cv.res_x-400)/2)}+{int((cv.res_y-350)/2)}"
+        )
+        self.root.resizable(0, 0)
+        self.root.iconbitmap('logo.ico')
+        self.img = {}
+        self.root.config(bg=cv.colores['background'])
+        self.widgets()
+
+    
+    def widgets(self):
         
+        ######################################################################   
+        # Referencia a imagenes
+        ######################################################################
+        
+        self.img['guardar'] = cv.formato_imagen(cv.imagenes['guardar'])
+
+        ######################################################################
+        # Labels
+        ######################################################################
+        
+        self.label_descuento = Label(
+            self.root,
+            text='Descuento',
+            font=cv.fuentes['texto'],
+            background=cv.colores['background']
+        )
+        self.label_descuento.place(relx=0.05, rely=0.15)
+
+        self.label_monto = Label(
+            self.root,
+            text='Monto minimo $',
+            font=cv.fuentes['texto'],
+            background=cv.colores['background']
+        )
+        self.label_monto.place(relx=0.05, rely=0.45)
+
+        ######################################################################
+        # Entries
+        ######################################################################
+        
+        self.entry_descuento = Entry(
+            self.root, font=cv.fuentes['texto'],width=8
+        )
+        self.entry_descuento.place(relx=0.55, rely=0.15)
+
+        self.entry_monto = Entry(
+            self.root, font=cv.fuentes['texto'], width=8
+        )
+        self.entry_monto.place(relx=0.55, rely=0.45)
+
+        ######################################################################
+        # Buttons
+        ######################################################################
+        
+        self.boton_guardar = Button(
+            self.root,
+            text='Guardar',
+            font=cv.fuentes['boton'],
+            width=120,
+            border=2,
+            relief='solid',
+            image=self.img['guardar'],
+            compound='left',
+            padx=10
+        )
+        self.boton_guardar.place(relx=0.5, rely=0.85, anchor='center')

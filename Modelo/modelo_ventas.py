@@ -11,16 +11,6 @@ from modelo.database import BaseDatos
 class ModeloVentas:
 
     ##########################################################################
-    # Atributos estaticos
-    ##########################################################################
-
-    # Atributo de clase para asignar descuento a clientes miembros
-    DESCUENTO_MIEMBRO = 0.20
-
-    # Atributo de clase para asignar monto minimo para aplicar descuento
-    MONTO_MINIMO = 30000
-
-    ##########################################################################
     # Metodos
     ##########################################################################
 
@@ -142,3 +132,40 @@ class ModeloVentas:
                 '''
 
         return BaseDatos.realizar_consulta(query, (nro_venta,), 'SELECT')
+    
+
+    @staticmethod
+    def descuento():
+
+        query = ''' SELECT 
+                        descuento
+                    FROM HistorialDescuentos
+                    ORDER BY id DESC
+                    LIMIT 1
+                '''
+
+        return BaseDatos.realizar_consulta(query, None, 'SELECT')
+
+
+    @staticmethod
+    def monto_minimo():
+
+        query = ''' SELECT
+                        monto_minimo
+                    FROM HistorialDescuentos
+                    ORDER BY id DESC
+                    LIMIT 1
+                '''
+
+        return BaseDatos.realizar_consulta(query, None, 'SELECT')
+    
+
+    @staticmethod
+    def nuevo_descuento_monto(descuento, monto):
+
+        query = ''' INSERT INTO HistorialDescuentos
+                    (descuento, monto_minimo)
+                    VALUES (?,?)
+                '''
+        
+        BaseDatos.realizar_consulta(query, (descuento, monto), None)

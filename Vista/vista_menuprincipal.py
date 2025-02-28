@@ -66,6 +66,8 @@ class VistaMenuPrincipal:
             text="INVENTARIO", 
             width=200,
             compound='left',
+            border=2,
+            relief='solid',
             font=cv.fuentes['boton'],
             image=self.imagenes['inventario'],
             padx=20
@@ -76,6 +78,8 @@ class VistaMenuPrincipal:
             self.frame_botones, 
             text="VENTAS", 
             width=200,
+            border=2,
+            relief='solid',
             font=cv.fuentes['boton'],
             image=self.imagenes['ventas'],
             compound='left',
