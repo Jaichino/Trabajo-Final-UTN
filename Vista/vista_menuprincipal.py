@@ -11,6 +11,10 @@ from vista.configuracion_vista import ConfiguracionVista as cv
 ##############################################################################
 
 class VistaMenuPrincipal:
+
+    ''' Clase donde se genera la interfaz grafica para del menu principal de
+        la aplicacion.
+    '''
     
     ##########################################################################    
     # Constructor de la ventana

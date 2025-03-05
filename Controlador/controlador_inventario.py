@@ -13,6 +13,10 @@ from vista.vista_inventario import VentanaInventario, VentanaDetalleProducto
 
 class ControladorInventario:
 
+    ''' La clase ControladorInventario es la encargada de la comunicacion de
+        la logica del negocio con la interfaz grafica del modulo Inventario.
+    '''
+
     ##########################################################################
     # Constructor del controlador
     ##########################################################################
@@ -34,7 +38,6 @@ class ControladorInventario:
 
         # Se guarda id_producto segun self.seleccion
         self.id_producto = None
-
 
         # Configuracion boton nuevo producto
         self.vista_inventario.boton_nuevo_producto.config(
@@ -66,6 +69,11 @@ class ControladorInventario:
     ##########################################################################
 
     def llenar_treeview_productos(self):
+
+        ''' Metodo para llenar el treeview con productos existentes en la base
+            de datos. Se buscan los productos utilizando 'mostrar_productos',
+            luego, si existen resultados, se insertan en treeview.
+        '''
         # Obtencion de lista de productos
         productos = self.modelo_inventario.mostrar_productos()
 
@@ -84,6 +92,12 @@ class ControladorInventario:
 
 
     def abrir_nuevo_producto(self):
+        
+        ''' Metodo para permitir la apertura de la ventana de detalle de
+            producto mediante el 'boton_nuevo_producto' unicamente si no
+            se han elegido productos en el treeview.
+        '''
+
         self.seleccion = self.vista_inventario.treeview_inventario.selection()
         if self.seleccion:
             messagebox.showwarning(
@@ -95,6 +109,12 @@ class ControladorInventario:
 
 
     def abrir_modificacion_producto(self):
+
+        ''' Metodo para permitir la apertura de la ventana de detalle de
+            producto mediante el 'boton_nuevo_producto' unicamente si se 
+            ha elegido un unico producto en el treeview.
+        '''
+
         self.seleccion = self.vista_inventario.treeview_inventario.selection()
         if len(self.seleccion) > 1:
             messagebox.showwarning(
@@ -114,6 +134,16 @@ class ControladorInventario:
 
 
     def ventana_detalle_producto(self):
+
+        ''' Metodo encargado de la creacion de un TopLevel para la apertura
+            de la ventana de detalle de producto. En caso de que se haya
+            seleccionado un elemento del treeview, se iniciara la ventana
+            con los Entry 'entry_descripcion', 'entry_precio' y
+            'entry_cantidad' con la informacion correspondiente al elemento
+            seleccionado.
+            La informacion del producto se extrae mediante el metodo llamado
+            'info_producto'.
+        '''
 
         self.top_level = Toplevel(self.root)
         self.abrir_detalle_producto = VentanaDetalleProducto(self.top_level)
@@ -147,6 +177,13 @@ class ControladorInventario:
 
 
     def boton_filtrar_productos(self):
+        
+        ''' Metodo para realizar el filtrado de productos en treeview.
+            Se obtiene valor de 'codigo' y 'descripcion' para luego llamar el
+            metodo 'filtrar_productos'. Si se obtienen resultados, se llena
+            treeview.
+        '''
+
         # Obtencion de entradas de usuario
         codigo = self.vista_inventario.entry_codigo.get()
         descripcion = self.vista_inventario.entry_descripcion.get()
@@ -178,6 +215,14 @@ class ControladorInventario:
 
 
     def boton_sin_stock(self):
+
+        ''' Metodo para el filtrado de productos sin stock. Se usa el metodo
+            'productos_sin_stock' para obtener aquellos productos con stock
+            igual a cero. En caso de obtenerse resultados, se llena el
+            treeview con dichos productos, caso contrario se muestra un
+            mensaje diciendo que no hay productos sin stock.
+        '''
+
         # Limpieza de treview
         self.vista_inventario.limpiar_treeview()
     
@@ -201,6 +246,18 @@ class ControladorInventario:
 
 
     def boton_guardar_producto(self):
+
+        ''' Metodo para guardar cambios en un producto. Se utiliza para
+            crear nuevos productos (en caso de no haber seleccionado 
+            ningun elemento del treeview) o para modificar un producto
+            existente (previa seleccion del elemento en treeview).
+            Se obtienen las entradas de usuario para los campos de 
+            'descripcion', 'precio' y 'cantidad' y luego se llama a los 
+            metodos 'nuevo_producto' o 'modificar_producto'.
+
+            :raises ValueError: Si se presenta error en tipo de datos.
+        '''
+
         try:
             # Se recuperan valores de entry
             descripcion = self.abrir_detalle_producto.entry_descripcion.get()
@@ -245,12 +302,17 @@ class ControladorInventario:
         # Manejo de excepciones
         except ValueError:
             messagebox.showerror('Error','Error en tipo de datos')
-        except Exception as e:
-            messagebox.showerror('Error',f'Error inesperado - {e}')
 
 
     def boton_eliminar_producto(self):
-        
+
+        ''' Metodo para realizar la eliminacion de productos de la base de
+            datos. Se verifica la seleccion de producto en treeview y se
+            llama al metodo 'eliminar_producto' siendo el parametro el
+            'id_producto' obtenido del treeview segun el elemento
+            seleccionado.
+        '''
+
         # Verificacion seleccion de elementos
         self.seleccion = self.vista_inventario.treeview_inventario.selection()
         if len(self.seleccion) != 1:

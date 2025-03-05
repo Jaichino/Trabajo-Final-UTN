@@ -19,7 +19,11 @@ from modelo.validacion import Validaciones
 ##############################################################################
 
 class ControladorVentas:
-    
+
+    ''' La clase ControladorVentas es la encargada de la comunicacion de
+        la logica del negocio con la interfaz grafica del modulo de Ventas.
+    '''
+
     ##########################################################################
     # Constructor del controlador
     ##########################################################################
@@ -85,6 +89,16 @@ class ControladorVentas:
     ##########################################################################
 
     def ventana_configuracion(self):
+
+        ''' Metodo encargado de crear un TopLevel de root, el cual se utiliza
+            para invocar la ventana 'VentanaConfiguracionDescuentos'.
+            Se inicializa dicha ventana con los ultimos registros de descuento
+            y monto_minimo, llamando a los metodos del modelo 'descuento()' y 
+            'monto_minimo()'.
+            Tambien se configura el metodo 'actualizar_descuento_monto' en el
+            boton 'boton_guardar' de la ventana. 
+            
+        '''
         # Generacion de TopLevel para apertura de ventana
         self.top_level = Toplevel(self.root)
         self.abrir_configuracion = VentanaConfiguracionDescuentos(
@@ -110,6 +124,12 @@ class ControladorVentas:
 
     
     def ventana_consulta_ventas(self):
+
+        ''' Metodo que se encarga de la creacion de un TopLevel para invocar
+            la ventana 'VentanaConsultaVentas'.
+            En dicha ventana tambien se configuran los metodos de los botones
+            correspondientes.
+        '''
         # Generacion de TopLevel para apertura de ventana
         self.top_level = Toplevel(self.root)
         self.abrir_consulta_ventas = VentanaConsultaVentas(self.top_level)
@@ -127,6 +147,14 @@ class ControladorVentas:
 
 
     def ventana_registro_cliente(self):
+
+        ''' Metodo encargado de la creacion de un TopLevel para invocar la
+            ventana 'VentanaMiembros'.
+            En esta ventana se configura el metodo vinculado a 'boton_guardar'
+            y tambien se configuran los eventos para la validacion de los
+            campos con los metodos del modulo 'Validacion'
+        '''
+
         # Creacion de TopLevel para apertura de ventana
         self.top_level = Toplevel(self.root)
         self.ventana_registro = VentanaMiembros(self.top_level)
@@ -163,6 +191,15 @@ class ControladorVentas:
 
     
     def validacion_cliente(self, event):
+
+        ''' Metodo para la validacion de clientes utilizando el metodo
+            'validacion_cliente'. Este metodo se vincula a un evento,
+            el cual cambiara el color de fuente de 'entry_cliente' en
+            funcion de si el cliente se valida correctamente o no.
+
+            :param event: Metodo que se vinculara a un evento KeyRelease
+        '''
+
         # Obtencion de cliente
         cliente = self.ventana_registro.entry_cliente.get()
 
@@ -181,6 +218,15 @@ class ControladorVentas:
 
 
     def validacion_dni(self, event):
+
+        ''' Metodo para la validacion de documento utilizando el metodo
+            'validacion_documento'. Este metodo se vincula a un evento,
+            el cual cambiara el color de fuente de 'entry_documento' en
+            funcion de si el documento se valida correctamente o no.
+
+            :param event: Metodo que se vinculara a un evento KeyRelease
+        '''
+
         # Obtencion del dni
         dni = self.ventana_registro.entry_documento.get()
 
@@ -198,6 +244,15 @@ class ControladorVentas:
     
 
     def validacion_telefono(self, event):
+
+        ''' Metodo para la validacion de telefonos utilizando el metodo
+            'validacion_telefono'. Este metodo se vincula a un evento,
+            el cual cambiara el color de fuente de 'entry_telefono' en
+            funcion de si el telefono se valida correctamente o no.
+
+            :param event: Metodo que se vinculara a un evento KeyRelease
+        '''
+
         # Obtencion telefono
         tel = self.ventana_registro.entry_telefono.get()
 
@@ -215,6 +270,15 @@ class ControladorVentas:
     
 
     def validacion_email(self, event):
+
+        ''' Metodo para la validacion de email utilizando el metodo
+            'validacion_email'. Este metodo se vincula a un evento,
+            el cual cambiara el color de fuente de 'entry_email' en
+            funcion de si el email se valida correctamente o no.
+
+            :param event: Metodo que se vinculara a un evento KeyRelease
+        '''
+
         # Obtencion email
         email = self.ventana_registro.entry_email.get()
 
@@ -232,6 +296,15 @@ class ControladorVentas:
     
 
     def filtrado_consulta_ventas(self):
+
+        ''' Metodo utilizado para filtrar el treeview de consulta de ventas
+            entre dos fechas definidas por el usuario 'fecha_inicio' y 
+            'fecha_fin'.
+            Una vez recuperados los valores de fecha, se obtienen las ventas
+            llamando el metodo 'consulta_ventas'. Si se obtienen resultados,
+            entonces se llena el treeview, caso contrario se muestra mensaje
+            comunicando que no se encontraron resultados.
+        '''
         # Obtencion de las fechas para filtrado
         fecha_inicio = self.abrir_consulta_ventas.fecha_desde.get()
         fecha_fin = self.abrir_consulta_ventas.fecha_hasta.get()
@@ -265,6 +338,17 @@ class ControladorVentas:
 
 
     def eliminar_venta(self):
+
+        ''' Metodo utilizado para eliminar una venta seleccionada en el
+            treeview. Primero se verifica que solo se haya seleccionado una
+            venta, luego se obtiene el numero de venta y se pregunta si se  
+            desea eliminar la venta. Si se confirma, se pregunta si se desea
+            devolver los productos a stock. Si se confirma, se recuperan los
+            productos vendidos y se devuelven a stock utilizando el metodo 
+            'devolver_productos'. Luego se eliminan los registros de la venta
+            con los metodos 'eliminar_detalle_ventas' y 'eliminar_venta'.
+        '''
+
         # Recuperacion de numero de venta segun elemento elegido en Treeview
         self.seleccion = (
             self.abrir_consulta_ventas.treeview_consulta.selection()
@@ -325,12 +409,14 @@ class ControladorVentas:
 
 
     def completar_detalle_producto(self, event):
-        '''
-        Esta funcion esta vinculada a un evento del tipo <KeyRelease> en el
-        entry del codigo de la ventana principal de ventas. Se busca la 
-        informacion del producto en ModeloInventario y luego se modifica el
-        valor text de label_descripcion y label_enstock para mostrar el
-        producto y su stock 
+
+        ''' Metodo utilizado para completar los labels de descripcion y stock
+            de un producto segun el codigo ingresado en 'entry_codigo'.
+            Se obtiene el codigo ingresado y se busca la informacion del
+            producto en la base de datos utilizando el metodo 'info_producto'.
+            Si se encuentra informacion, se completan los labels con la
+            descripcion y el stock del producto. Si no se encuentra informacion,
+            se muestra 'Producto no encontrado'.
         '''
         # Obtencion del codigo ingresado
         codigo = self.vista_ventas.entry_codigo.get()
@@ -355,6 +441,18 @@ class ControladorVentas:
 
 
     def boton_agregar_carrito(self):
+
+        ''' Metodo utilizado para agregar un producto al carrito de ventas.
+            Se obtienen los valores de 'entry_codigo' y 'entry_cantidad' y se
+            verifica si el producto existe en la base de datos. Si existe y
+            la cantidad ingresada es menor o igual al stock, se agrega el
+            producto al treeview 'treeview_carrito' y se actualizan los
+            totales de venta y a pagar. Si la cantidad es mayor al stock o si
+            el producto no existe, se muestra un mensaje de error.
+
+            :raises ValueError: Si los valores ingresados no son validos.
+        '''
+
         try:
             # Obtencion de valores de entry
             codigo = int(self.vista_ventas.entry_codigo.get())
@@ -410,11 +508,16 @@ class ControladorVentas:
 
         except ValueError:
             messagebox.showerror('Error','Error en ingreso de datos')
-        except Exception as e:
-            messagebox.showerror('Error',f'Error inesperado - {e}')
 
 
     def boton_eliminar_carrito(self):
+
+        ''' Metodo utilizado para eliminar un producto del carrito de ventas.
+            Se obtiene el producto seleccionado en el treeview y se elimina
+            del mismo. Se actualizan los totales de venta y a pagar segun el
+            monto del producto eliminado.
+        '''
+
         # Obtencion del elemento a eliminar
         seleccion = self.vista_ventas.treeview_carrito.selection()
 
@@ -449,6 +552,18 @@ class ControladorVentas:
 
 
     def boton_finalizar_venta(self):
+
+        ''' Metodo utilizado para finalizar una venta. Se obtiene la fecha de
+            venta y se verifica si hay productos en el carrito. Si no hay
+            productos, se muestra un mensaje de advertencia. Si hay productos,
+            se pregunta si se desea finalizar la venta. Si se confirma, se
+            obtiene el numero de venta y se carga en la tabla 'Ventas' con el 
+            metodo 'nueva_venta'. Luego se cargan los productos vendidos en la
+            tabla 'DetalleVentas' con el metodo 'agregar_detalle_ventas'. Se 
+            descuentan los productos vendidos del stock con el metodo
+            'descontar_producto'. Se muestra un mensaje de confirmacion y se
+            limpian los campos de la ventana.
+        '''
 
         # Obtencion de fecha venta
         fecha_venta = self.vista_ventas.entry_fecha.get()
@@ -561,6 +676,17 @@ class ControladorVentas:
 
 
     def boton_verificar_cliente(self):
+
+        ''' Metodo utilizado para verificar si un cliente es miembro del
+            supermercado y aplicar descuentos en caso de ser miembro. Se
+            obtiene el dni del cliente y se verifica si existe en la base de
+            datos. Si no existe, se muestra un mensaje de advertencia y se
+            setea el total a pagar como el total de venta. Si el cliente es
+            miembro, se aplica el descuento correspondiente y se actualiza el
+            total a pagar. Si el cliente ya fue verificado, se muestra un
+            mensaje de advertencia.
+        '''
+
         # Verificacion de que primero haya productos en carrito
         productos_carrito = self.vista_ventas.treeview_carrito.get_children()
         if not productos_carrito:
@@ -638,6 +764,17 @@ class ControladorVentas:
 
 
     def boton_nuevo_miembro(self):
+
+        """
+            Metodo para registrar un nuevo miembro en el sistema.
+        
+            Este metodo recupera las entradas del usuario desde la ventana de
+            registro, valida los datos ingresados y, si son validos, registra
+            al nuevo miembro en la base de datos. Si los datos no son validos,
+            muestra un mensaje de error. Finalmente, muestra un mensaje de 
+            confirmacion y cierra la ventana de registro.
+        """
+
         # Se recuperan entradas de usuario
         cliente = self.ventana_registro.entry_cliente.get()
         dni = self.ventana_registro.entry_documento.get()
@@ -677,6 +814,17 @@ class ControladorVentas:
     
 
     def actualizar_descuento_monto(self):
+
+        ''' Metodo utilizado para actualizar los valores de descuento y monto
+            minimo en la base de datos. Se obtienen los valores ingresados en
+            'entry_descuento' y 'entry_monto'. Se verifica que los valores
+            sean validos y se actualizan los valores en la base de datos. Se
+            muestra un mensaje de confirmacion y se cierra la ventana de
+            configuracion.
+
+            :raises ValueError: Si los valores ingresados no son validos.
+        '''
+        
         try:
             # Recuperacion valores de entry
             descuento = float(self.abrir_configuracion.entry_descuento.get())

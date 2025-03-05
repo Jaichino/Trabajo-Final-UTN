@@ -13,7 +13,7 @@ class ConfiguracionVista:
     ''' 
     En esta clase se definen todas las propiedades que se encargaran de
     configurar las vistas, a modo de facilitar los cambios a medida que 
-    la aplicacion crece
+    la aplicacion crece.
     '''
 
     ##########################################################################

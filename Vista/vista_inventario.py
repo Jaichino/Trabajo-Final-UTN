@@ -11,6 +11,11 @@ from vista.configuracion_vista import ConfiguracionVista as cv
 ##############################################################################
 
 class VentanaInventario:
+    
+    ''' Clase que representa la ventana principal de Inventario. Dentro de
+        esta ventana se encuentran los widgets necesarios para la 
+        visualizacion de los productos en el inventario.
+    '''
 
     ##########################################################################
     # Constructor de la ventana
@@ -250,6 +255,11 @@ class VentanaInventario:
 ##############################################################################
 
 class VentanaDetalleProducto:
+    
+    ''' Clase que representa la ventana de detalle de producto. Dentro de
+        esta ventana se encuentran los widgets necesarios para la 
+        visualizacion de los detalles de un producto en especifico.
+    '''
     
     ##########################################################################
     # Constructor de la ventana

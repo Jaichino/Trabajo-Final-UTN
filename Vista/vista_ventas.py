@@ -13,6 +13,9 @@ from vista.configuracion_vista import ConfiguracionVista as cv
 ##############################################################################
 
 class VentanaVentas:
+
+    ''' Clase donde se genera la interfaz grafica para el modulo de ventas.
+    '''
     
     def __init__(self, root):
         self.root = root
@@ -332,6 +335,9 @@ class VentanaVentas:
 
 class VentanaConsultaVentas:
 
+    ''' Clase donde se genera la interfaz grafica para la consulta de ventas.
+    '''
+
     ##########################################################################
     # Constructor de la ventana
     ##########################################################################
@@ -496,6 +502,10 @@ class VentanaConsultaVentas:
 
 class VentanaMiembros:
 
+    ''' Clase donde se genera la interfaz grafica para el registro de nuevos
+        miembros.
+    '''
+
     ##########################################################################
     # Constructor de la ventana
     ##########################################################################
@@ -614,6 +624,10 @@ class VentanaMiembros:
 ##############################################################################
 
 class VentanaConfiguracionDescuentos:
+    
+    ''' Clase donde se genera la interfaz grafica para la configuracion de
+        descuentos.
+    '''
     
     ##########################################################################
     # Constructor de la ventana

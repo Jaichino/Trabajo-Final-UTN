@@ -39,16 +39,13 @@ class ControladorMenuPrincipal:
     # Metodos
     ##########################################################################
 
-    """
-    Metodos para iniciar los modulos de inventario y ventas, primero se 
-    minimiza el menu principal utilizando el metodo iconify(), se genera
-    un TopLevel de root y se instancian las clases para generar las vistas
-    correspondientes. Se establece protocolo en TopLevel para cerrar modulos
-    al cerrar la ventana desde la cruz, esto llama nuevamente al menu 
-    principal.
-    """
-
     def iniciar_modulo_inventario(self):
+
+        ''' Metodo para abrir el modulo de inventario. Se crea un TopLevel y
+            se instancia el controlador del modulo de inventario. Se asigna el
+            evento de cerrar modulo al TopLevel.
+        '''
+
         self.minimizar_menu_principal()
         self.top_level = Toplevel(self.root)
         self.abrir_ventana_inventario = ControladorInventario(self.top_level)
@@ -57,6 +54,12 @@ class ControladorMenuPrincipal:
     
 
     def iniciar_modulo_ventas(self):
+
+        ''' Metodo para abrir el modulo de ventas. Se crea un TopLevel y
+            se instancia el controlador del modulo de ventas. Se asigna el
+            evento de cerrar modulo al TopLevel.
+        '''
+        
         self.minimizar_menu_principal()
         self.top_level = Toplevel(self.root)
         self.abrir_ventana_ventas = ControladorVentas(self.top_level)
