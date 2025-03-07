@@ -87,7 +87,7 @@ class ControladorInventario:
                     '',
                     'end',
                     text = prod[0],
-                    values = (prod[1], f'$ {prod[2]}', prod[3])
+                    values = (prod[1], prod[2], prod[3])
                 )
 
 
@@ -206,7 +206,7 @@ class ControladorInventario:
                     '',
                     'end',
                     text = prod[0],
-                    values = (prod[1], f'$ {prod[2]}', prod[3])
+                    values = (prod[1], prod[2], prod[3])
                 )
         
         # Limpieza de cajas y focus en entry codigo
@@ -234,7 +234,7 @@ class ControladorInventario:
                     '',
                     'end',
                     text = prod[0],
-                    values = (prod[1], f'$ {prod[2]}', prod[3])
+                    values = (prod[1], prod[2], prod[3])
                 )
         else:
             # Mensaje de aviso y se llena treeview con todos los productos

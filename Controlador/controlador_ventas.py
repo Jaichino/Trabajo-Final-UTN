@@ -333,7 +333,7 @@ class ControladorVentas:
                 "",
                 "end",
                 text= venta[0],
-                values= (venta[1], venta[2], f'$ {venta[3]}')
+                values= (venta[1], venta[2], venta[3])
             )
 
 
@@ -488,7 +488,7 @@ class ControladorVentas:
                 "",
                 "end",
                 text = codigo,
-                values = (descripcion, f'$ {precio}', cantidad, f' $ {subtotal}')
+                values = (descripcion, precio, cantidad, subtotal)
             )
 
             # Limpieza de cajas y foco en entry_codigo
@@ -701,9 +701,9 @@ class ControladorVentas:
 
         # Verificacion que existe en base de clientes
         validacion = self.modelo_ventas.obtener_nombre_cliente(cliente)
-        if not validacion:
+        if not validacion or cliente == '0':
             self.vista_ventas.label_cliente_encontrado.config(
-                text = 'Cliente: No registrado')
+                text = 'Cliente: Cliente no registrado')
             
             self.total_pagar = self.total_venta
             self.vista_ventas.label_descuentos.config(
