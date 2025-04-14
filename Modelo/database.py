@@ -2,76 +2,97 @@
 # Importaciones
 ##############################################################################
 
-import sqlite3
+from sqlmodel import SQLModel, Field, Relationship, create_engine, text
+from sqlmodel import Session
 
 ##############################################################################
-# Clase conexion con base de datos
+# Creación del modelo de base de datos
 ##############################################################################
 
-class BaseDatos:
 
-    ''' Clase que contiene los metodos necesarios para establecer la conexion
-        con la base de datos y de la interaccion con la misma.
-    '''
+class Cliente(SQLModel, table=True):
+    documento : int | None = Field(default=None, primary_key=True)
+    nombre: str
+    telefono: str
+    email: str
 
-    ##########################################################################
-    # Metodos
-    ##########################################################################
+    ventas: list["Venta"] = Relationship(back_populates="cliente",
+                                        cascade_delete=True)
+
+
+class HistorialDescuento(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    descuento: float
+    monto_minimo: float
+
+class DetalleVenta(SQLModel, table=True):
+    nro_venta: int | None = Field(
+                                    default=None,
+                                    foreign_key="venta.nro_venta",
+                                    primary_key=True,
+                                    ondelete="CASCADE"
+                                )
     
-    @staticmethod
-    def conexion():
-        
-        ''' Metodo para establecer conexion con la base de datos.
-            :return: Conexion a base de datos.
-        '''
-        try:
-            conn = sqlite3.connect('Market.db')
-            return conn
-        except Exception as e:
-            print(f'Error al conectarse con la base de datos - {e}')
+    codigo_producto: int | None = Field(
+                                    default=None,
+                                    foreign_key="producto.codigo_producto",
+                                    primary_key=True,
+                                    ondelete="CASCADE"
+                                    )
+    cantidad: int
+
+    venta: "Venta" = Relationship(back_populates="link_productos")
+    producto: "Producto" = Relationship(back_populates="link_ventas")
+
+class Producto(SQLModel, table=True):
+    codigo_producto: int | None = Field(default=None, primary_key=True)
+    descripcion: str
+    precio_unitario: float
+    stock: int
+    estado: bool = True
+
+    link_ventas: list[DetalleVenta] = Relationship(back_populates="producto",
+                                                    cascade_delete=True)
+
+class Venta(SQLModel, table=True):
+    nro_venta: int | None = Field(default=None, primary_key=True)
+    fecha: str
+    monto_total: float
+    descuento_miembro: float = 0
+
+    cliente_id: int = Field(default=0, 
+                        foreign_key="cliente.documento",
+                        ondelete="CASCADE")
     
-
-    @staticmethod
-    def cerrar_conexion(conn):
-        
-        ''' Metodo encargado de cerrar la conexion a la base de datos.
-        '''
-        if conn:
-            conn.close()
+    cliente: "Cliente" = Relationship(back_populates="ventas")
     
+    link_productos: list[DetalleVenta] = Relationship(back_populates="venta",
+                                                        cascade_delete=True)
 
-    @staticmethod
-    def realizar_consulta(sql, valores=None, tipo=None):
-        
-        ''' Metodo encargado de realizar consultas SQL a la base de datos.
-            Primero se establece la conexion utilizando el metodo 'conexion',
-            luego se crea un cursor y se ejecuta la consulta con parametros
-            especificados, los cuales pueden ser None. El tercer parametro
-            del metodo por defecto es None, en caso de ser 'SELECT' retorna
-            un resultado mediante el metodo fetchall.
 
-            :return: Cambios en la base de datos, retorno de resultado para
-                consultas del tipo 'SELECT'.
-        '''
-        conn = BaseDatos.conexion()
-        if conn:
-            try:
-                cursor = conn.cursor()
-                if valores:
-                    cursor.execute(sql,valores)
-                else:
-                    cursor.execute(sql)
+bd_name = "market_sistem.db"
+bd_url = f"sqlite:///{bd_name}"
+engine = create_engine(bd_url, echo=True)
 
-                conn.commit()
+# Creación de base de datos 
+def create_bd():
+    SQLModel.metadata.create_all(engine)
+    with engine.connect() as connection:
+        connection.execute(text("PRAGMA foreign_keys=ON"))
 
-                if tipo == "SELECT":
-                    resultado = cursor.fetchall()
-                    return resultado
-            
-            except Exception as e:
-                print(f"Error al realizar consulta - {e}")
-                conn.rollback()
-            
-            finally:
-                cursor.close()
-                BaseDatos.cerrar_conexion(conn)
+# Creación de usuario inicial (Usuario no registrado)
+def creacion_usuario_inicial():
+    with Session(engine) as sesion:
+        usuario_cero = Cliente(
+            documento=0,
+            nombre="Usuario no registrado",
+            telefono="-",
+            email="-"
+        )
+        sesion.add(usuario_cero)
+        sesion.commit()
+
+if __name__ == '__main__':
+    create_bd()
+    creacion_usuario_inicial()
+
