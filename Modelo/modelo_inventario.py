@@ -2,7 +2,8 @@
 # Importaciones
 ##############################################################################
 
-from modelo.database import BaseDatos
+from sqlmodel import Session, select
+from database import engine, Producto
 
 ##############################################################################
 # Clase modelo de inventario
@@ -20,7 +21,7 @@ class ModeloInventario:
     ##########################################################################
 
     @staticmethod
-    def mostrar_productos():
+    def mostrar_productos(estado=True):
         
         ''' Metodo para obtener toda la informacion de productos de la tabla
             'Productos', donde su 'estado' sea igual a 'True' (productos
@@ -29,12 +30,21 @@ class ModeloInventario:
             :return: Lista de productos disponibles.
             :rtype: list
         '''
-        query = 'SELECT * FROM Productos WHERE estado = ?'
-        return BaseDatos.realizar_consulta(query, ('True',), 'SELECT')
+        with Session(engine) as sesion:
+            productos = sesion.exec(
+                select(Producto).where(Producto.estado == estado)
+            ).all()
+
+            return productos
 
 
     @staticmethod
-    def nuevo_producto(descripcion, precio_unitario, stock):
+    def nuevo_producto(
+        descripcion: str, 
+        precio_unitario: float, 
+        stock: int, 
+        estado=True
+    ):
 
         ''' Metodo para la creacion de nuevos productos en la base de datos.
             Se toma como parametros 'descripcion', 'precio_unitario' y 'stock'
@@ -42,23 +52,26 @@ class ModeloInventario:
             :param str descripcion: Descripcion del producto.
             :param float precio_unitario: Precio unitario del producto.
             :param int stock: Stock disponible del producto.
+            :param bool estado: Estado de disponibilidad de producto.
         '''
 
-        query = ''' INSERT INTO Productos (descripcion,precio_unitario,stock)
-                    VALUES (?,?,?)
-                '''
+        with Session(engine) as sesion:
+            producto = Producto(
+                descripcion=descripcion,
+                precio_unitario=precio_unitario,
+                stock=stock,
+                estado=estado
+            )
+            sesion.add(producto)
+            sesion.commit()
 
-        BaseDatos.realizar_consulta(query,
-                                    (descripcion,precio_unitario,stock),
-                                    None)
 
-    
     @staticmethod
     def modificar_producto(
-        descripcion, 
-        precio_unitario, 
-        stock, 
-        codigo_producto
+        descripcion: str, 
+        precio_unitario: float, 
+        stock: int, 
+        id_prod: int
     ):
         
         ''' Metodo para realizar la modificacion de un producto existente en
@@ -67,25 +80,24 @@ class ModeloInventario:
             :param str descripcion: Descripcion del producto.
             :param float precio_unitario: Precio unitario del producto.
             :param int stock: Stock del producto.
-            :param int codigo_producto: Codigo del producto a modificar.
+            :param int id_prod: Codigo del producto a modificar.
         '''
+        with Session(engine) as sesion:
 
-        query = ''' UPDATE Productos SET descripcion = ?, 
-                    precio_unitario = ?, 
-                    stock = ?
-                    WHERE codigo_producto = ?
-                '''
-        
-        BaseDatos.realizar_consulta(query,
-                                    (descripcion,
-                                    precio_unitario,
-                                    stock,
-                                    codigo_producto),
-                                    None)
+            producto_modificar = sesion.exec(
+                select(Producto).where(Producto.codigo_producto == id_prod)
+            ).one()
+
+            producto_modificar.descripcion = descripcion
+            producto_modificar.precio_unitario = precio_unitario
+            producto_modificar.stock = stock
+
+            sesion.add(producto_modificar)
+            sesion.commit()
 
 
     @staticmethod
-    def eliminar_producto(codigo_producto):
+    def eliminar_producto(id_prod: int):
 
         ''' Metodo para eliminar un producto de la base de datos. Toma como
             parametro el 'codigo_producto'
@@ -93,11 +105,14 @@ class ModeloInventario:
             :param int codigo_producto: Codigo del producto a eliminar.
         '''
 
-        query = ''' UPDATE Productos SET estado = 'False'
-                    WHERE codigo_producto = ?
-                '''
+        with Session(engine) as sesion:
+            producto_eliminar = sesion.exec(
+                select(Producto).where(Producto.codigo_producto == id_prod)
+            ).one()
 
-        BaseDatos.realizar_consulta(query, (codigo_producto,), None)
+            producto_eliminar.estado = False
+            sesion.add(producto_eliminar)
+            sesion.commit()
 
 
     @staticmethod
@@ -114,24 +129,24 @@ class ModeloInventario:
             :rtype: list
         '''
 
-        params = ['True']
-        query = 'SELECT * FROM Productos WHERE estado = ?'
-        
-        if codigo is not None:
-            query += ' AND codigo_producto = ?'
-            params.append(codigo)
-        
-        if descripcion is not None:
-            query += ' AND descripcion LIKE ? COLLATE NOCASE'
-            params.append(f'%{descripcion}%')
-        
-        query += ' ORDER BY descripcion'
+        with Session(engine) as sesion:
 
-        return BaseDatos.realizar_consulta(query, params, 'SELECT')
+            query = select(Producto).where(Producto.estado == True)
+
+            if codigo is not None:
+                query = query.where(Producto.codigo_producto == codigo)
+
+            if descripcion is not None:
+                query = query.where(
+                    Producto.descripcion.like(f"%{descripcion}%")
+                    )
+
+            productos = sesion.exec(query).all()
+            return productos
 
 
     @staticmethod
-    def productos_sin_stock():
+    def productos_sin_stock(stock=0, estado=True):
 
         ''' Metodo para obtener todos aquellos productos cuyo stock es igual
             a cero.
@@ -139,15 +154,19 @@ class ModeloInventario:
             :return: Lista de productos con stock igual a cero.
             :rtype: list
         '''
+        with Session(engine) as sesion:
 
-        query = ''' SELECT * FROM Productos 
-                    WHERE stock = ? AND estado = ?'''
+            prod_sin_stock = sesion.exec(
+                select(Producto)
+                .where(Producto.stock == stock)
+                .where(Producto.estado == estado)
+            ).all()
 
-        return BaseDatos.realizar_consulta(query, (0,'True'), 'SELECT')
+            return prod_sin_stock
 
 
     @staticmethod
-    def info_producto(codigo, estado='True'):
+    def info_producto(codigo: int, estado=True):
 
         ''' Metodo para obtener la informacion de un producto determinado
             mediante su 'codigo' y cuando su 'estado' sea igual a True.
@@ -157,14 +176,14 @@ class ModeloInventario:
             :return: Lista informacion de producto determinado.
             :rtype: list
         '''
+        with Session(engine) as sesion:
+            info = sesion.exec(
+                select(Producto)
+                .where(Producto.codigo_producto == codigo)
+                .where(Producto.estado == estado)
+            ).first()
 
-        query = ''' SELECT descripcion, precio_unitario, stock
-                    FROM Productos WHERE estado = ? AND
-                    codigo_producto = ?
-                '''
-        
-        return BaseDatos.realizar_consulta(query, (estado,codigo), 'SELECT')
-
+            return info
 
     @staticmethod
     def descontar_producto(codigo, cantidad):
@@ -175,12 +194,14 @@ class ModeloInventario:
             :param int codigo: Codigo de producto vendido
             :param int cantidad: Cantidad vendida del producto.
         '''
+        with Session(engine) as sesion:
+            producto_vendido = sesion.exec(
+                select(Producto).where(Producto.codigo_producto == codigo)
+            ).one()
 
-        query = ''' UPDATE Productos SET stock = stock - ?
-                    WHERE codigo_producto = ?
-                '''
-        
-        BaseDatos.realizar_consulta(query, (cantidad, codigo), None)
+            producto_vendido.stock -= cantidad
+            sesion.add(producto_vendido)
+            sesion.commit()
 
 
     @staticmethod
@@ -192,9 +213,27 @@ class ModeloInventario:
             :param int codigo: Codigo de producto a devolver.
             :param int cantidad: Cantidad a devolver del producto.
         '''
+        with Session(engine) as sesion:
+            producto_a_devolver = sesion.exec(
+                select(Producto).where(Producto.codigo_producto == codigo)
+            ).one()
 
-        query = ''' UPDATE Productos SET stock = stock + ?
-                    WHERE codigo_producto = ?
-                '''
-        
-        BaseDatos.realizar_consulta(query, (cantidad, codigo), None)
+            producto_a_devolver.stock += cantidad
+            sesion.add(producto_a_devolver)
+            sesion.commit()
+
+if __name__ == '__main__':
+    
+    ModeloInventario.devolver_productos(codigo=3, cantidad=2)
+    
+    info = ModeloInventario.info_producto(codigo=3)
+    print(info)
+    
+    #ModeloInventario.eliminar_producto(1)
+    
+    #info = ModeloInventario.mostrar_productos()
+    #for producto in info:
+    #    nombre = producto.descripcion
+    #    precio = producto.precio_unitario
+    #    stock = producto.stock
+    #    print(nombre,precio,stock)
