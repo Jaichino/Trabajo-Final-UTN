@@ -2,7 +2,9 @@
 # Importaciones
 ##############################################################################
 
-from modelo.database import BaseDatos
+from sqlmodel import Session, select
+from database import Venta, DetalleVenta, Cliente, Producto, engine
+from sqlalchemy.orm import selectinload
 
 ##############################################################################
 # Clase modelo de ventas
@@ -20,125 +22,83 @@ class ModeloVentas:
     ##########################################################################
 
     @staticmethod
-    def nueva_venta(
-        nro_venta, 
-        fecha, 
-        cliente, 
-        monto_total, 
-        descuento_miembro
+    def nueva_venta( 
+        fecha: str, 
+        cliente: int, 
+        monto_total: float, 
+        descuento_miembro: float,
+        productos: dict
     ):
-        ''' Metodo que se encarga de insertar un nuevo registro de venta en la
-            tabla 'Ventas'.
+        with Session(engine) as sesion:
+            # Creación de instancia en Venta
+            venta = Venta(
+                fecha=fecha,
+                cliente_id=cliente,
+                monto_total=monto_total,
+                descuento_miembro=descuento_miembro
+            )
+            sesion.add(venta)
+            sesion.commit()
+            sesion.refresh(venta)
 
-            :param int nro_venta: Numero de venta realizada.
-            :param date fecha: Fecha en la que se lleva a cabo la venta.
-            :param int cliente: Numero de documento de cliente. 0 si no esta
-                registrado
-            :param float monto_total: Monto total de la venta
-            :param float descuento_miembro: Descuento aplicado a venta si
-                corresponde
-        '''
-
-        query = ''' 
-                    INSERT INTO Ventas
-                    (nro_venta,fecha,cliente,monto_total,descuento_miembro) 
-                    VALUES (?,?,?,?,?)
-                '''
-
-        BaseDatos.realizar_consulta(query,
-                                    (nro_venta,
-                                    fecha,
-                                    cliente,
-                                    monto_total,
-                                    descuento_miembro),
-                                    None)
+            # Creación del detalle de venta
+            for prod, cant in productos.items():
+                detalleventa = DetalleVenta(
+                    nro_venta=venta.nro_venta,
+                    codigo_producto=prod,
+                    cantidad=cant
+                )
+                sesion.add(detalleventa)
+            sesion.commit()
 
 
-    @staticmethod
-    def agregar_detalle_ventas(nro_venta, codigo_producto, cantidad):
-
-        ''' Metodo para insertar detalle de una determinada venta en la tabla
-            DetalleVentas. Se insertan tantos registros como tipos de producto
-            se hayan vendido.
-
-            :param int nro_venta: Referencia al numero de venta
-            :param int codigo_producto: Numero de producto vendido.
-            :param int cantidad: Cantidad de cada tipo de producto vendido.
-        '''
-
-        query = ''' INSERT INTO DetalleVentas
-                    (nro_venta,codigo_producto,cantidad)
-                    VALUES (?,?,?)
-                '''
-
-        BaseDatos.realizar_consulta(query,
-                                    (nro_venta, codigo_producto, cantidad),
-                                    None)
-
-
-    @staticmethod
-    def consulta_ventas(fecha_inicio, fecha_final):
-
-        ''' Metodo que recopila la informacion de ventas entre dos fechas
-            especificadas 'fecha_inicio' y 'fecha_final'.
-
-            :param date fecha_inicio: Fecha inicial de filtrado.
-            :param date fecha_final: Fecha final de filtrado.
-            :return: Lista con ventas entre dos fechas determinadas.
-            :rtype: list
-
-        '''
-        query = ''' SELECT 
-                        v.nro_venta,
-                        v.fecha,
-                        c.nombre,
-                        v.monto_total
-                    FROM Ventas v
-                    INNER JOIN Clientes c
-                    ON v.cliente = c.documento
-                    WHERE v.fecha BETWEEN ? AND ?
-                    ORDER BY v.nro_venta
-                '''
-
-        return BaseDatos.realizar_consulta(query,
-                                            (fecha_inicio, fecha_final),
-                                            "SELECT")
+    #@staticmethod
+    #def consulta_ventas(fecha_inicio, fecha_final):
+#
+    #    ''' Metodo que recopila la informacion de ventas entre dos fechas
+    #        especificadas 'fecha_inicio' y 'fecha_final'.
+#
+    #        :param str fecha_inicio: Fecha inicial de filtrado.
+    #        :param str fecha_final: Fecha final de filtrado.
+    #        :return: Lista con ventas entre dos fechas determinadas.
+    #        :rtype: list
+#
+    #    '''
+    #    query = ''' SELECT 
+    #                    v.nro_venta,
+    #                    v.fecha,
+    #                    c.nombre,
+    #                    v.monto_total
+    #                FROM Ventas v
+    #                INNER JOIN Clientes c
+    #                ON v.cliente = c.documento
+    #                WHERE v.fecha BETWEEN ? AND ?
+    #                ORDER BY v.nro_venta
+    #            '''
+#
+    #    return BaseDatos.realizar_consulta(query,
+    #                                        (fecha_inicio, fecha_final),
+    #                                        "SELECT")
 
 
     @staticmethod
-    def eliminar_venta(nro_venta):
-        
+    def eliminar_venta(nro_venta: int):
+
         ''' Metodo que elimina una venta determinada de la base de datos,
             tomando como parametro 'nro_venta'.
-
             :param int nro_venta: Numero de venta a eliminar.
         '''
+        with Session(engine) as sesion:
+            venta_eliminar = sesion.exec(
+                select(Venta).where(Venta.nro_venta == nro_venta)
+            ).one()
 
-        query = ''' DELETE FROM Ventas
-                    WHERE nro_venta = ?
-                '''
-
-        BaseDatos.realizar_consulta(query, (nro_venta,), None)
-        
-
-    @staticmethod
-    def eliminar_detalle_ventas(nro_venta):
-
-        ''' Metodo para eliminar los detalles de venta correspondientes a un
-            determinado 'nro_venta'.
-
-            :param int nro_venta: Numero de venta a eliminar en DetalleVentas.
-        '''
-        
-        query = ''' DELETE FROM DetalleVentas
-                    WHERE nro_venta = ?
-                '''
-
-        BaseDatos.realizar_consulta(query, (nro_venta,), None)
+            sesion.delete(venta_eliminar)
+            sesion.commit()
 
 
     @staticmethod
-    def registrar_cliente(nombre,dni,tel,email):
+    def registrar_cliente(nombre: str, dni: int, tel: str, email: str):
         
         ''' Metodo utilizado para registrar nuevos clientes en la base de
             datos.
@@ -148,48 +108,33 @@ class ModeloVentas:
             :param str tel: Numero de telefono del miembro (eg: 351-4567545)
             :param str email: Correo electronico del miembro.
         '''
-
-        query = ''' INSERT INTO Clientes(documento,nombre,telefono,email)
-                    VALUES(?, ?, ?, ?)
-                '''
-        
-        BaseDatos.realizar_consulta(query, (dni,nombre,tel,email), None)
+        with Session(engine) as sesion:
+            nuevo_cliente = Cliente(
+                documento=dni,
+                nombre=nombre,
+                telefono=tel,
+                email=email
+            )
+            sesion.add(nuevo_cliente)
+            sesion.commit()
 
 
     @staticmethod
-    def obtener_nombre_cliente(dni):
+    def obtener_cliente(dni: int):
         
-        ''' Metodo utilizado para obtener el nombre de un cliente utilizando
+        ''' Metodo utilizado para obtener informacion de un cliente utilizando
             su numero de documento 'dni'.
 
             :param int dni: Numero de documento del cliente.
-            :return: Lista que contiene el nombre del cliente.
-            :rtype: list
+            :return: Devuelve cliente.
+            :rtype: Object Cliente
         '''
+        with Session(engine) as sesion:
+            cliente_consultado = sesion.exec(
+                select(Cliente).where(Cliente.documento == dni)
+            ).one()
 
-        query = ''' SELECT nombre FROM Clientes
-                    WHERE documento = ?
-                '''
-        
-        return BaseDatos.realizar_consulta(query,(dni,),'SELECT')
-
-
-    @staticmethod
-    def obtener_nro_venta():
-        
-        ''' Metodo utilizado para obtener el ultimo numero de venta de la
-            tabla Ventas. Utilizado para tener de referencia para la creacion
-            de una nueva venta.
-
-            :return: Lista con ultimo numero de venta de la tabla Ventas.
-            :rtype: list
-        '''
-
-        query = ''' SELECT MAX(nro_venta)
-                    FROM Ventas
-                '''
-        
-        return BaseDatos.realizar_consulta(query,None,'SELECT')
+            return cliente_consultado
 
 
     @staticmethod
@@ -212,63 +157,89 @@ class ModeloVentas:
                 '''
 
         return BaseDatos.realizar_consulta(query, (nro_venta,), 'SELECT')
+#    
+#
+#    @staticmethod
+#    def descuento():
+#
+#        ''' Metodo utilizado para obtener el ultimo descuento agregado,
+#            siempre que se modifique el valor de descuento aplicado se
+#            creara un nuevo registro. Este metodo obtiene ese ultimo
+#            valor.
+#
+#            :return: Lista que contiene el ultimo descuento aplicado.
+#            :rtype: list
+#        '''
+#
+#        query = ''' SELECT 
+#                        descuento
+#                    FROM HistorialDescuentos
+#                    ORDER BY id DESC
+#                    LIMIT 1
+#                '''
+#
+#        return BaseDatos.realizar_consulta(query, None, 'SELECT')
+#
+#
+#    @staticmethod
+#    def monto_minimo():
+#        
+#        ''' Metodo que obtiene el ultimo monto minimo necesario para aplicar
+#            un descuento.
+#
+#            :return: Lista que contiene el ultimo monto_minimo guardado.
+#            :rtype: list
+#        '''
+#
+#        query = ''' SELECT
+#                        monto_minimo
+#                    FROM HistorialDescuentos
+#                    ORDER BY id DESC
+#                    LIMIT 1
+#                '''
+#
+#        return BaseDatos.realizar_consulta(query, None, 'SELECT')
+#    
+#
+#    @staticmethod
+#    def nuevo_descuento_monto(descuento, monto):
+#
+#        ''' Metodo que introduce un nuevo registro en la tabla de
+#            HistorialDescuentos.
+#
+#            :param float descuento: Descuento a aplicar a ventas de miembros.
+#            :param int monto: Monto minimo a partir del cual se aplica 
+#                descuento
+#        '''
+#        query = ''' INSERT INTO HistorialDescuentos
+#                    (descuento, monto_minimo)
+#                    VALUES (?,?)
+#                '''
+#        
+#        BaseDatos.realizar_consulta(query, (descuento, monto), None)
+
+
+    def consulta_venta():
+        with Session(engine) as sesion:
+            venta = sesion.exec(
+                select(Venta).where(Venta.nro_venta == 1)
+            ).one()
+
+            print(venta.link_productos)
+
+if __name__ == "__main__":
     
-
-    @staticmethod
-    def descuento():
-
-        ''' Metodo utilizado para obtener el ultimo descuento agregado,
-            siempre que se modifique el valor de descuento aplicado se
-            creara un nuevo registro. Este metodo obtiene ese ultimo
-            valor.
-
-            :return: Lista que contiene el ultimo descuento aplicado.
-            :rtype: list
-        '''
-
-        query = ''' SELECT 
-                        descuento
-                    FROM HistorialDescuentos
-                    ORDER BY id DESC
-                    LIMIT 1
-                '''
-
-        return BaseDatos.realizar_consulta(query, None, 'SELECT')
-
-
-    @staticmethod
-    def monto_minimo():
-        
-        ''' Metodo que obtiene el ultimo monto minimo necesario para aplicar
-            un descuento.
-
-            :return: Lista que contiene el ultimo monto_minimo guardado.
-            :rtype: list
-        '''
-
-        query = ''' SELECT
-                        monto_minimo
-                    FROM HistorialDescuentos
-                    ORDER BY id DESC
-                    LIMIT 1
-                '''
-
-        return BaseDatos.realizar_consulta(query, None, 'SELECT')
+    consulta = ModeloVentas.consulta_venta()
     
-
-    @staticmethod
-    def nuevo_descuento_monto(descuento, monto):
-
-        ''' Metodo que introduce un nuevo registro en la tabla de
-            HistorialDescuentos.
-
-            :param float descuento: Descuento a aplicar a ventas de miembros.
-            :param int monto: Monto minimo a partir del cual se aplica 
-                descuento
-        '''
-        query = ''' INSERT INTO HistorialDescuentos
-                    (descuento, monto_minimo)
-                    VALUES (?,?)
-                '''
-        
-        BaseDatos.realizar_consulta(query, (descuento, monto), None)
+    
+    #ModeloVentas.eliminar_venta(3)
+    
+    #fecha = "20-05-2025"
+    #cliente = 0
+    #monto_total = 2000000
+    #descuento_miembro = 0.2
+    #productos = {
+    #            1:1,
+    #            }
+    #
+    #ModeloVentas.nueva_venta(fecha, cliente, monto_total, descuento_miembro, productos)

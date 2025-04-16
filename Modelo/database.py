@@ -4,6 +4,7 @@
 
 from sqlmodel import SQLModel, Field, Relationship, create_engine, text
 from sqlmodel import Session
+from sqlalchemy import event
 
 ##############################################################################
 # Creación del modelo de base de datos
@@ -41,8 +42,8 @@ class DetalleVenta(SQLModel, table=True):
                                     )
     cantidad: int
 
-    venta: "Venta" = Relationship(back_populates="link_productos")
-    producto: "Producto" = Relationship(back_populates="link_ventas")
+    venta: list["Venta"] = Relationship(back_populates="link_productos")
+    producto: list["Producto"] = Relationship(back_populates="link_ventas")
 
 class Producto(SQLModel, table=True):
     codigo_producto: int | None = Field(default=None, primary_key=True)
@@ -72,13 +73,27 @@ class Venta(SQLModel, table=True):
 
 bd_name = "market_sistem.db"
 bd_url = f"sqlite:///{bd_name}"
-engine = create_engine(bd_url, echo=True)
+engine = create_engine(
+    bd_url, 
+    echo=True
+)
 
 # Creación de base de datos 
 def create_bd():
     SQLModel.metadata.create_all(engine)
     with engine.connect() as connection:
         connection.execute(text("PRAGMA foreign_keys=ON"))
+
+##############################################################################
+##############################################################################
+# SOLO PARA SQLite, PARA ACTIVAR LAS FOREIGN KEYS EN TODAS LAS SESIONES
+@event.listens_for(engine, "connect")
+def enable_foreign_keys(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()
+##############################################################################
+##############################################################################
 
 # Creación de usuario inicial (Usuario no registrado)
 def creacion_usuario_inicial():

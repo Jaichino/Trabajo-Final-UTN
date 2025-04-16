@@ -3,7 +3,7 @@
 ##############################################################################
 
 from sqlmodel import Session, select
-from database import engine, Producto
+from modelo.database import engine, Producto
 
 ##############################################################################
 # Clase modelo de inventario
@@ -21,7 +21,7 @@ class ModeloInventario:
     ##########################################################################
 
     @staticmethod
-    def mostrar_productos(estado=True):
+    def mostrar_productos(estado: int=True):
         
         ''' Metodo para obtener toda la informacion de productos de la tabla
             'Productos', donde su 'estado' sea igual a 'True' (productos
@@ -43,7 +43,7 @@ class ModeloInventario:
         descripcion: str, 
         precio_unitario: float, 
         stock: int, 
-        estado=True
+        estado: bool=True
     ):
 
         ''' Metodo para la creacion de nuevos productos en la base de datos.
@@ -116,7 +116,7 @@ class ModeloInventario:
 
 
     @staticmethod
-    def filtrar_productos(codigo=None, descripcion=None):
+    def filtrar_productos(codigo: int=None, descripcion: str=None):
 
         ''' Metodo para filtrar productos segun su 'codigo' o segun una
             coincidencia en su 'descripcion'. Por defecto, ambos parametros
@@ -146,7 +146,7 @@ class ModeloInventario:
 
 
     @staticmethod
-    def productos_sin_stock(stock=0, estado=True):
+    def productos_sin_stock(stock: int=0, estado: bool=True):
 
         ''' Metodo para obtener todos aquellos productos cuyo stock es igual
             a cero.
@@ -186,7 +186,7 @@ class ModeloInventario:
             return info
 
     @staticmethod
-    def descontar_producto(codigo, cantidad):
+    def descontar_producto(codigo: int, cantidad: int):
 
         ''' Metodo para restar los productos que fueron vendidos en una venta
             determinada.
@@ -205,7 +205,7 @@ class ModeloInventario:
 
 
     @staticmethod
-    def devolver_productos(codigo, cantidad):
+    def devolver_productos(codigo: int, cantidad: int):
 
         ''' Metodo para devolver a stock los productos en caso de que una
             venta sea eliminada.
@@ -221,19 +221,3 @@ class ModeloInventario:
             producto_a_devolver.stock += cantidad
             sesion.add(producto_a_devolver)
             sesion.commit()
-
-if __name__ == '__main__':
-    
-    ModeloInventario.devolver_productos(codigo=3, cantidad=2)
-    
-    info = ModeloInventario.info_producto(codigo=3)
-    print(info)
-    
-    #ModeloInventario.eliminar_producto(1)
-    
-    #info = ModeloInventario.mostrar_productos()
-    #for producto in info:
-    #    nombre = producto.descripcion
-    #    precio = producto.precio_unitario
-    #    stock = producto.stock
-    #    print(nombre,precio,stock)
