@@ -3,8 +3,8 @@
 ##############################################################################
 
 from sqlmodel import Session, select
-from database import Venta, DetalleVenta, Cliente, Producto, engine
-from sqlalchemy.orm import selectinload
+from database import Venta, DetalleVenta, Cliente, HistorialDescuento, engine
+from sqlalchemy import func, between
 
 ##############################################################################
 # Clase modelo de ventas
@@ -52,33 +52,27 @@ class ModeloVentas:
             sesion.commit()
 
 
-    #@staticmethod
-    #def consulta_ventas(fecha_inicio, fecha_final):
-#
-    #    ''' Metodo que recopila la informacion de ventas entre dos fechas
-    #        especificadas 'fecha_inicio' y 'fecha_final'.
-#
-    #        :param str fecha_inicio: Fecha inicial de filtrado.
-    #        :param str fecha_final: Fecha final de filtrado.
-    #        :return: Lista con ventas entre dos fechas determinadas.
-    #        :rtype: list
-#
-    #    '''
-    #    query = ''' SELECT 
-    #                    v.nro_venta,
-    #                    v.fecha,
-    #                    c.nombre,
-    #                    v.monto_total
-    #                FROM Ventas v
-    #                INNER JOIN Clientes c
-    #                ON v.cliente = c.documento
-    #                WHERE v.fecha BETWEEN ? AND ?
-    #                ORDER BY v.nro_venta
-    #            '''
-#
-    #    return BaseDatos.realizar_consulta(query,
-    #                                        (fecha_inicio, fecha_final),
-    #                                        "SELECT")
+    @staticmethod
+    def consulta_ventas(fecha_inicio: str, fecha_final: str):
+
+        ''' Metodo que recopila la informacion de ventas entre dos fechas
+            especificadas 'fecha_inicio' y 'fecha_final'.
+
+            :param str fecha_inicio: Fecha inicial de filtrado.
+            :param str fecha_final: Fecha final de filtrado.
+            :return: Lista con ventas entre dos fechas determinadas.
+            :rtype: list
+
+        '''
+
+        with Session(engine) as sesion:
+            resultados = sesion.exec(
+                select(Venta)
+                .where(between(Venta.fecha, fecha_inicio, fecha_final))
+                .order_by(Venta.nro_venta)
+            ).all()
+
+            return resultados
 
 
     @staticmethod
@@ -138,7 +132,7 @@ class ModeloVentas:
 
 
     @staticmethod
-    def obtener_detalle_ventas(nro_venta):
+    def obtener_detalle_ventas(nro_venta: int):
 
         ''' Metodo utilizado para obtener el detalle de productos y cantidad
             vendida en una determinada venta 'nro_venta'.
@@ -149,87 +143,70 @@ class ModeloVentas:
             :rtype: list
         '''
 
-        query = ''' SELECT
-                        codigo_producto,
-                        cantidad
-                    FROM DetalleVentas
-                    WHERE nro_venta = ?
-                '''
-
-        return BaseDatos.realizar_consulta(query, (nro_venta,), 'SELECT')
-#    
-#
-#    @staticmethod
-#    def descuento():
-#
-#        ''' Metodo utilizado para obtener el ultimo descuento agregado,
-#            siempre que se modifique el valor de descuento aplicado se
-#            creara un nuevo registro. Este metodo obtiene ese ultimo
-#            valor.
-#
-#            :return: Lista que contiene el ultimo descuento aplicado.
-#            :rtype: list
-#        '''
-#
-#        query = ''' SELECT 
-#                        descuento
-#                    FROM HistorialDescuentos
-#                    ORDER BY id DESC
-#                    LIMIT 1
-#                '''
-#
-#        return BaseDatos.realizar_consulta(query, None, 'SELECT')
-#
-#
-#    @staticmethod
-#    def monto_minimo():
-#        
-#        ''' Metodo que obtiene el ultimo monto minimo necesario para aplicar
-#            un descuento.
-#
-#            :return: Lista que contiene el ultimo monto_minimo guardado.
-#            :rtype: list
-#        '''
-#
-#        query = ''' SELECT
-#                        monto_minimo
-#                    FROM HistorialDescuentos
-#                    ORDER BY id DESC
-#                    LIMIT 1
-#                '''
-#
-#        return BaseDatos.realizar_consulta(query, None, 'SELECT')
-#    
-#
-#    @staticmethod
-#    def nuevo_descuento_monto(descuento, monto):
-#
-#        ''' Metodo que introduce un nuevo registro en la tabla de
-#            HistorialDescuentos.
-#
-#            :param float descuento: Descuento a aplicar a ventas de miembros.
-#            :param int monto: Monto minimo a partir del cual se aplica 
-#                descuento
-#        '''
-#        query = ''' INSERT INTO HistorialDescuentos
-#                    (descuento, monto_minimo)
-#                    VALUES (?,?)
-#                '''
-#        
-#        BaseDatos.realizar_consulta(query, (descuento, monto), None)
-
-
-    def consulta_venta():
         with Session(engine) as sesion:
             venta = sesion.exec(
-                select(Venta).where(Venta.nro_venta == 1)
+                select(Venta).where(Venta.nro_venta == nro_venta)
             ).one()
 
-            print(venta.link_productos)
+            detalle = []
+            objetos_detalleventa = venta.link_productos
+            for obj in objetos_detalleventa:
+                detalle.append((obj.codigo_producto, obj.cantidad))
+            
+            return detalle
+
+
+    @staticmethod
+    def descuento_y_montomin():
+
+        ''' Metodo utilizado para obtener el ultimo descuento agregado,
+            siempre que se modifique el valor de descuento aplicado se
+            creara un nuevo registro. Este metodo obtiene ese ultimo
+            valor.
+
+            :return: Tupla que contiene el ultimo descuento aplicado
+            y el respectivo monto minimo para aplicar descuento.
+            :rtype: tuple
+        '''
+        with Session(engine) as sesion:
+            last_id_desc = sesion.exec(
+                select(func.max(HistorialDescuento.id))
+            ).one()
+
+            desc_aplicar = sesion.exec(
+                select(HistorialDescuento)
+                .where(HistorialDescuento.id == last_id_desc)
+            ).one()
+
+            return (desc_aplicar.descuento, desc_aplicar.monto_minimo)
+
+
+    @staticmethod
+    def nuevo_descuento_monto(descuento: float, monto: int):
+
+        ''' Metodo que introduce un nuevo registro en la tabla de
+            HistorialDescuentos.
+
+            :param float descuento: Descuento a aplicar a ventas de miembros.
+            :param int monto: Monto minimo a partir del cual se aplica 
+                descuento
+        '''
+        with Session(engine) as sesion:
+            registro_descuento = HistorialDescuento(
+                descuento=descuento,
+                monto_minimo=monto
+            )
+
+            sesion.add(registro_descuento)
+            sesion.commit()
+
 
 if __name__ == "__main__":
     
-    consulta = ModeloVentas.consulta_venta()
+    #ModeloVentas.nuevo_descuento_monto(0.45, 3000000)
+
+    consulta = ModeloVentas.consulta_ventas("16-04-2025", "25-05-2026")
+    print(consulta)
     
     
     #ModeloVentas.eliminar_venta(3)
