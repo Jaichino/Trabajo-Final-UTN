@@ -3,7 +3,7 @@
 ##############################################################################
 
 from sqlmodel import Session, select
-from database import Venta, DetalleVenta, Cliente, HistorialDescuento, engine
+from modelo.database import Venta, DetalleVenta, Cliente, HistorialDescuento, engine
 from sqlalchemy import func, between
 
 ##############################################################################
@@ -67,7 +67,13 @@ class ModeloVentas:
 
         with Session(engine) as sesion:
             resultados = sesion.exec(
-                select(Venta)
+                select(
+                    Venta.nro_venta, 
+                    Venta.fecha, 
+                    Cliente.nombre, 
+                    Venta.monto_total
+                )
+                .join(Cliente, Cliente.documento == Venta.cliente_id)
                 .where(between(Venta.fecha, fecha_inicio, fecha_final))
                 .order_by(Venta.nro_venta)
             ).all()
@@ -126,7 +132,7 @@ class ModeloVentas:
         with Session(engine) as sesion:
             cliente_consultado = sesion.exec(
                 select(Cliente).where(Cliente.documento == dni)
-            ).one()
+            ).first()
 
             return cliente_consultado
 
@@ -199,24 +205,3 @@ class ModeloVentas:
 
             sesion.add(registro_descuento)
             sesion.commit()
-
-
-if __name__ == "__main__":
-    
-    #ModeloVentas.nuevo_descuento_monto(0.45, 3000000)
-
-    consulta = ModeloVentas.consulta_ventas("16-04-2025", "25-05-2026")
-    print(consulta)
-    
-    
-    #ModeloVentas.eliminar_venta(3)
-    
-    #fecha = "20-05-2025"
-    #cliente = 0
-    #monto_total = 2000000
-    #descuento_miembro = 0.2
-    #productos = {
-    #            1:1,
-    #            }
-    #
-    #ModeloVentas.nueva_venta(fecha, cliente, monto_total, descuento_miembro, productos)

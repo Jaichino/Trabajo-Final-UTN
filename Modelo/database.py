@@ -107,7 +107,13 @@ def creacion_usuario_inicial():
         sesion.add(usuario_cero)
         sesion.commit()
 
-if __name__ == '__main__':
-    create_bd()
-    creacion_usuario_inicial()
+##############################################################################
+##############################################################################
+# Ejecutar solo si no se ha creado la base de datos anteriormente
 
+#if __name__ == '__main__':
+#    create_bd()
+#    creacion_usuario_inicial()
+
+##############################################################################
+##############################################################################

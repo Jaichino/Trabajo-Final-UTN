@@ -109,12 +109,12 @@ class ControladorVentas:
         # Iniciacion de entries con valores actuales de descuento y monto
         self.abrir_configuracion.entry_descuento.insert(
             0,
-            self.modelo_ventas.descuento()[0][0]
+            self.modelo_ventas.descuento_y_montomin()[0]
         )
 
         self.abrir_configuracion.entry_monto.insert(
             0,
-            self.modelo_ventas.monto_minimo()[0][0]
+            self.modelo_ventas.descuento_y_montomin()[1]
         )
 
         # Asignacion de metodo a boton guardado de descuento
@@ -333,7 +333,9 @@ class ControladorVentas:
                 "",
                 "end",
                 text= venta[0],
-                values= (venta[1], venta[2], venta[3])
+                values= (
+                    venta[1], venta[2], venta[3]
+                )
             )
 
 
@@ -346,7 +348,7 @@ class ControladorVentas:
             devolver los productos a stock. Si se confirma, se recuperan los
             productos vendidos y se devuelven a stock utilizando el metodo 
             'devolver_productos'. Luego se eliminan los registros de la venta
-            con los metodos 'eliminar_detalle_ventas' y 'eliminar_venta'.
+            con el metodo 'eliminar_venta'.
         '''
 
         # Recuperacion de numero de venta segun elemento elegido en Treeview
@@ -394,7 +396,6 @@ class ControladorVentas:
                     )
 
             # Eliminacion de venta
-            self.modelo_ventas.eliminar_detalle_ventas(nro_venta)
             self.modelo_ventas.eliminar_venta(nro_venta)
 
             # Mensaje de confirmacion
@@ -426,10 +427,10 @@ class ControladorVentas:
         if info:
             # Seteo de labels
             self.vista_ventas.label_descripcion.config(
-                text = f'Descripcion: {info[0][0]}'
+                text = f'Descripcion: {info.descripcion}'
             )
             self.vista_ventas.label_enstock.config(
-                text = f'En Stock: {info[0][2]}'
+                text = f'En Stock: {info.stock}'
             )
         else:
             self.vista_ventas.label_descripcion.config(
@@ -468,9 +469,9 @@ class ControladorVentas:
                 return
             
             # Propiedades del producto
-            descripcion = producto[0][0]
-            precio = producto[0][1]
-            stock = producto[0][2]
+            descripcion = producto.descripcion
+            precio = producto.precio_unitario
+            stock = producto.stock
 
             # Si cantidad > stock, se da mensaje de error
             if cantidad > stock:
@@ -556,11 +557,9 @@ class ControladorVentas:
         ''' Metodo utilizado para finalizar una venta. Se obtiene la fecha de
             venta y se verifica si hay productos en el carrito. Si no hay
             productos, se muestra un mensaje de advertencia. Si hay productos,
-            se pregunta si se desea finalizar la venta. Si se confirma, se
-            obtiene el numero de venta y se carga en la tabla 'Ventas' con el 
-            metodo 'nueva_venta'. Luego se cargan los productos vendidos en la
-            tabla 'DetalleVentas' con el metodo 'agregar_detalle_ventas'. Se 
-            descuentan los productos vendidos del stock con el metodo
+            se pregunta si se desea finalizar la venta. Si se confirma, se 
+            agrega una nueva venta. 
+            Se descuentan los productos vendidos del stock con el metodo
             'descontar_producto'. Se muestra un mensaje de confirmacion y se
             limpian los campos de la ventana.
         '''
@@ -569,7 +568,7 @@ class ControladorVentas:
         fecha_venta = self.vista_ventas.entry_fecha.get()
         
         # Obtencion de los productos del carrito en una lista
-        lista_productos = []
+        productos = {}
         items = self.vista_ventas.treeview_carrito.get_children()
 
         # Verificacion si hay productos en carrito
@@ -593,42 +592,28 @@ class ControladorVentas:
                 cantidad = int(info[2])
 
                 # Se agrega codigo y cantidad a lista_productos
-                lista_productos.append((codigo,cantidad))
-
-            # Obtencion del numero de venta
-            info_nro_venta = self.modelo_ventas.obtener_nro_venta()
-            if info_nro_venta[0][0] is None:
-                nro_venta = 1
-            else:
-                nro_venta = info_nro_venta[0][0] + 1
+                productos[codigo] = cantidad
 
             # Carga de venta en tabla Ventas
             self.modelo_ventas.nueva_venta(
-                nro_venta,
-                fecha_venta,
-                self.cliente,
-                self.total_pagar,
-                self.descuento_aplicado
+                fecha=fecha_venta,
+                cliente=self.cliente,
+                monto_total=self.total_pagar,
+                descuento_miembro=self.descuento_aplicado,
+                productos=productos
             )
 
-            # Carga productos en Detalle Ventas
-            for producto in lista_productos:
-                self.modelo_ventas.agregar_detalle_ventas(
-                    nro_venta,
-                    producto[0],
-                    producto[1]
-                )
-
-                # Se descuentan productos vendidos de Inventario
+            # Se descuentan productos vendidos de Inventario
+            for codigo, cantidad in productos.items():
                 ModeloInventario.descontar_producto(
-                    producto[0],
-                    producto[1]
+                    codigo,
+                    cantidad
                 )
             
             # Mensaje de confirmacion
             messagebox.showinfo(
                 'Ventas',
-                f'Venta #{nro_venta} generada correctamente!'
+                f'Venta generada correctamente!'
             )
 
             # Consulta de registro de cliente como miembro del negocio
@@ -700,7 +685,7 @@ class ControladorVentas:
         cliente = self.vista_ventas.entry_cliente.get()
 
         # Verificacion que existe en base de clientes
-        validacion = self.modelo_ventas.obtener_nombre_cliente(cliente)
+        validacion = self.modelo_ventas.obtener_cliente(cliente)
         if not validacion or cliente == '0':
             self.vista_ventas.label_cliente_encontrado.config(
                 text = 'Cliente: Cliente no registrado')
@@ -721,7 +706,7 @@ class ControladorVentas:
         # Si cliente es miembro, se aplica descuento
         else:   
                 # Obtencion nombre de cliente
-                nombre_cliente = validacion[0][0]
+                nombre_cliente = validacion.nombre
 
                 # Se verifica que no se aplique descuento mas veces
                 if self.cliente != cliente:
@@ -736,10 +721,10 @@ class ControladorVentas:
                     )
                     
                     # Se calcula descuento y se aplica
-                    descuento = ModeloVentas().descuento()[0][0]
+                    descuento = self.modelo_ventas.descuento_y_montomin()[0]
                     
                     # Se aplica si supera el monto minimo
-                    monto_minimo = ModeloVentas().monto_minimo()[0][0]
+                    monto_minimo = ModeloVentas().descuento_y_montomin()[1]
                     
                     if self.total_pagar > monto_minimo:
                         self.descuento_aplicado = descuento * self.total_venta

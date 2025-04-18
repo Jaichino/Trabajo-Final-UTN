@@ -86,8 +86,10 @@ class ControladorInventario:
                 self.vista_inventario.treeview_inventario.insert(
                     '',
                     'end',
-                    text = prod[0],
-                    values = (prod[1], prod[2], prod[3])
+                    text = prod.codigo_producto,
+                    values = (
+                        prod.descripcion, prod.precio_unitario, prod.stock
+                    )
                 )
 
 
@@ -162,13 +164,13 @@ class ControladorInventario:
             )
 
             self.abrir_detalle_producto.entry_descripcion.insert(
-                0,info_producto[0][0]
+                0,info_producto.descripcion
             )
             self.abrir_detalle_producto.entry_precio.insert(
-                0,info_producto[0][1]
+                0,info_producto.precio_unitario
             )
             self.abrir_detalle_producto.entry_cantidad.insert(
-                0,info_producto[0][2]
+                0,info_producto.stock
             )
         
         self.abrir_detalle_producto.boton_guardar.config(
@@ -205,8 +207,10 @@ class ControladorInventario:
                 self.vista_inventario.treeview_inventario.insert(
                     '',
                     'end',
-                    text = prod[0],
-                    values = (prod[1], prod[2], prod[3])
+                    text = prod.codigo_producto,
+                    values = (
+                        prod.descripcion, prod.precio_unitario, prod.stock
+                    )
                 )
         
         # Limpieza de cajas y focus en entry codigo
@@ -233,8 +237,10 @@ class ControladorInventario:
                 self.vista_inventario.treeview_inventario.insert(
                     '',
                     'end',
-                    text = prod[0],
-                    values = (prod[1], prod[2], prod[3])
+                    text = prod.codigo_producto,
+                    values = (
+                        prod.descripcion, prod.precio_unitario, prod.stock
+                    )
                 )
         else:
             # Mensaje de aviso y se llena treeview con todos los productos
