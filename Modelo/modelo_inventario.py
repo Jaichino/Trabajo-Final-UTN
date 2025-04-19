@@ -4,6 +4,7 @@
 
 from sqlmodel import Session, select
 from modelo.database import engine, Producto
+from modelo.logging import registro_logging
 
 ##############################################################################
 # Clase modelo de inventario
@@ -39,6 +40,7 @@ class ModeloInventario:
 
 
     @staticmethod
+    @registro_logging("Producto creado")
     def nuevo_producto(
         descripcion: str, 
         precio_unitario: float, 
@@ -67,6 +69,7 @@ class ModeloInventario:
 
 
     @staticmethod
+    @registro_logging("Producto modificado")
     def modificar_producto(
         descripcion: str, 
         precio_unitario: float, 
@@ -97,6 +100,7 @@ class ModeloInventario:
 
 
     @staticmethod
+    @registro_logging("Producto eliminado")
     def eliminar_producto(id_prod: int):
 
         ''' Metodo para eliminar un producto de la base de datos. Toma como

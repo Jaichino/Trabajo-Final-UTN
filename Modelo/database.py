@@ -75,7 +75,7 @@ bd_name = "market_sistem.db"
 bd_url = f"sqlite:///{bd_name}"
 engine = create_engine(
     bd_url, 
-    echo=True
+    echo=False
 )
 
 # Creación de base de datos 

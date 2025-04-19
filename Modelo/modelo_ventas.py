@@ -5,6 +5,7 @@
 from sqlmodel import Session, select
 from modelo.database import Venta, DetalleVenta, Cliente, HistorialDescuento, engine
 from sqlalchemy import func, between
+from modelo.logging import registro_logging
 
 ##############################################################################
 # Clase modelo de ventas
@@ -22,6 +23,7 @@ class ModeloVentas:
     ##########################################################################
 
     @staticmethod
+    @registro_logging("Nueva venta realizada")
     def nueva_venta( 
         fecha: str, 
         cliente: int, 
@@ -82,6 +84,7 @@ class ModeloVentas:
 
 
     @staticmethod
+    @registro_logging("Registro de venta eliminado")
     def eliminar_venta(nro_venta: int):
 
         ''' Metodo que elimina una venta determinada de la base de datos,
@@ -98,6 +101,7 @@ class ModeloVentas:
 
 
     @staticmethod
+    @registro_logging("Cliente registrado")
     def registrar_cliente(nombre: str, dni: int, tel: str, email: str):
         
         ''' Metodo utilizado para registrar nuevos clientes en la base de
@@ -188,6 +192,7 @@ class ModeloVentas:
 
 
     @staticmethod
+    @registro_logging("Descuentos actualizados")
     def nuevo_descuento_monto(descuento: float, monto: int):
 
         ''' Metodo que introduce un nuevo registro en la tabla de

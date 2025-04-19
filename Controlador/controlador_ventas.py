@@ -779,6 +779,15 @@ class ControladorVentas:
                 'Verificar campos, no debe haber campos en rojo o vacios!'
             )
             return
+        
+        # Verificacion de que no existe el cliente en la base de datos
+        consulta_cliente = self.modelo_ventas.obtener_cliente(dni=dni)
+        if consulta_cliente:
+            messagebox.showerror(
+                'Cliente existente',
+                'El documento ingresado corresponde a un cliente registrado'
+            )
+            return
 
         # Carga de cliente
         self.modelo_ventas.registrar_cliente(
