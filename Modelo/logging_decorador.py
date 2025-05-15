@@ -25,7 +25,7 @@ def registro_logging(mensaje="Accion ejecutada"):
             tiempo_accion = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
             
             # Configuracion de mensaje de log
-            linea_log = f"[{tiempo_accion}] INFO: {mensaje}"
+            linea_log = f"[CONSOLA DECORADOR] [{tiempo_accion}] INFO: {mensaje}"
 
             # Se agregan args/kwargs a linea de log
             if args:

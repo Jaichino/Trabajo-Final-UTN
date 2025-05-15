@@ -4,7 +4,8 @@
 
 from sqlmodel import Session, select
 from modelo.database import engine, Producto
-from modelo.logging import registro_logging
+from modelo.logging_decorador import registro_logging
+from modelo.logging_observador import logger
 
 ##############################################################################
 # Clase modelo de inventario
@@ -67,6 +68,10 @@ class ModeloInventario:
             sesion.add(producto)
             sesion.commit()
 
+            logger.log(
+                "Producto creado", args=(descripcion, precio_unitario, stock)
+            )
+
 
     @staticmethod
     @registro_logging("Producto modificado")
@@ -98,6 +103,11 @@ class ModeloInventario:
             sesion.add(producto_modificar)
             sesion.commit()
 
+            logger.log(
+                "Producto modificado", 
+                args= (descripcion, precio_unitario, stock, id_prod)
+            )
+
 
     @staticmethod
     @registro_logging("Producto eliminado")
@@ -117,6 +127,8 @@ class ModeloInventario:
             producto_eliminar.estado = False
             sesion.add(producto_eliminar)
             sesion.commit()
+
+            logger.log("Producto eliminado", args=(id_prod))
 
 
     @staticmethod
@@ -188,6 +200,7 @@ class ModeloInventario:
             ).first()
 
             return info
+
 
     @staticmethod
     def descontar_producto(codigo: int, cantidad: int):

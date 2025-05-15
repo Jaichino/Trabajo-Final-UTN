@@ -3,9 +3,12 @@
 ##############################################################################
 
 from sqlmodel import Session, select
-from modelo.database import Venta, DetalleVenta, Cliente, HistorialDescuento, engine
+from modelo.database import (
+    Venta, DetalleVenta, Cliente, HistorialDescuento, engine
+)
 from sqlalchemy import func, between
-from modelo.logging import registro_logging
+from modelo.logging_decorador import registro_logging
+from modelo.logging_observador import logger
 
 ##############################################################################
 # Clase modelo de ventas
@@ -53,6 +56,16 @@ class ModeloVentas:
                 sesion.add(detalleventa)
             sesion.commit()
 
+            logger.log(
+                    "Nueva venta realizada",
+                    kwargs={
+                        'cliente': cliente, 
+                        'monto_total': monto_total,
+                        'descuento_miembro': descuento_miembro,
+                        'productos': productos
+                    }  
+            )
+
 
     @staticmethod
     def consulta_ventas(fecha_inicio: str, fecha_final: str):
@@ -99,6 +112,8 @@ class ModeloVentas:
             sesion.delete(venta_eliminar)
             sesion.commit()
 
+            logger.log("Registro de venta eliminado", args=(nro_venta))
+
 
     @staticmethod
     @registro_logging("Cliente registrado")
@@ -121,6 +136,16 @@ class ModeloVentas:
             )
             sesion.add(nuevo_cliente)
             sesion.commit()
+
+            logger.log(
+                        "Cliente registrado",
+                        kwargs={
+                                'nombre':nombre,
+                                'dni': dni,
+                                'telefono': tel,
+                                'email':email
+                                }
+            )
 
 
     @staticmethod

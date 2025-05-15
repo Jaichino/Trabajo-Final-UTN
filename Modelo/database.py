@@ -42,8 +42,8 @@ class DetalleVenta(SQLModel, table=True):
                                     )
     cantidad: int
 
-    venta: list["Venta"] = Relationship(back_populates="link_productos")
-    producto: list["Producto"] = Relationship(back_populates="link_ventas")
+    venta: 'Venta' = Relationship(back_populates="link_productos")
+    producto: 'Producto' = Relationship(back_populates="link_ventas")
 
 class Producto(SQLModel, table=True):
     codigo_producto: int | None = Field(default=None, primary_key=True)

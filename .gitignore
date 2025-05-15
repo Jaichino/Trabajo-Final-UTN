@@ -9,3 +9,4 @@ imagenes/
 .venv/
 market_sistem.db
 control_logging.txt
+__pycache__
